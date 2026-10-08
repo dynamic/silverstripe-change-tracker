@@ -80,7 +80,7 @@ class TrackedManyManyList extends ManyManyList
                 $item = $class::get()->byID($item);
             }
             $join = $type === 'add' ? ' to ' : ' from ';
-            $type = ucfirst($type) . ' "' . $item->Title . '"' . $join . $relationName;
+            $type = ucfirst((string) $type) . ' "' . $item->Title . '"' . $join . $relationName;
             $onItem->RelatedItem = $item->ClassName . ' #' . $item->ID;
             $changeRecord = singleton('DataChangeTrackService')->track($onItem, $type);
 
