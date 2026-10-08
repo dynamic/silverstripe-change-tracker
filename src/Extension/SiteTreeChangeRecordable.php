@@ -3,6 +3,7 @@
 namespace Dynamic\ChangeTracker\Extension;
 
 use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Permission;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
@@ -16,6 +17,17 @@ use SilverStripe\Forms\GridField\GridField;
  */
 class SiteTreeChangeRecordable extends ChangeRecordable
 {
+    /**
+     * Permission code needed to see the Published States tab. The fork checked the literal code
+     * CMS_ACCESS_DataChangeAdmin, which no group was normally given while the admin required a code derived from its
+     * class name, so the tab was shown to administrators and to holders of CMS_ACCESS_LeftAndMain. This default keeps that
+     * audience now that the admin requires CMS_ACCESS_DataChangeAdmin itself.
+     *
+     * @config
+     * @var string
+     */
+    private static $published_state_permission = 'CMS_ACCESS_LeftAndMain';
+
     public function onAfterPublish(&$original)
     {
         $this->dataChangeTrackService->track($this->owner, 'Publish');
@@ -28,7 +40,7 @@ class SiteTreeChangeRecordable extends ChangeRecordable
 
     public function updateCMSFields(FieldList $fields)
     {
-        if (Permission::check('CMS_ACCESS_DataChangeAdmin')) {
+        if (Permission::check(Config::inst()->get(SiteTreeChangeRecordable::class, 'published_state_permission'))) {
             //Get all data changes relating to this page filter them by publish/unpublish
             $dataChanges = DataChangeRecord::get()->filter([
                     'ChangeRecordID' => $this->owner->ID,

@@ -2,9 +2,11 @@
 
 namespace Dynamic\ChangeTracker\Tests\Characterization;
 
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable;
 use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
 use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
@@ -56,13 +58,24 @@ class SiteTreeChangeRecordableTest extends CharacterizationTestCase
         $this->assertNotNull($this->grid($page));
     }
 
-    public function testTabVisibleForHolderOfTheLiteralCode()
+    public function testTabHiddenForHolderOfTheAdminCodeOnly()
     {
         $page = $this->lifecyclePage();
 
         $this->logInWithPermission('CMS_ACCESS_DataChangeAdmin');
 
-        // the tab checks the literal code, which the admin screen itself does not require
+        // the tab requires CMS_ACCESS_LeftAndMain, so access to the Data Changes admin alone does not show it, as
+        // before the admin's code was fixed
+        $this->assertNull($page->getCMSFields()->fieldByName('Root.PublishedState'));
+    }
+
+    public function testTabPermissionIsConfigurable()
+    {
+        $page = $this->lifecyclePage();
+        Config::modify()->set(SiteTreeChangeRecordable::class, 'published_state_permission', 'CMS_ACCESS_CMSMain');
+
+        $this->logInWithPermission('CMS_ACCESS_CMSMain');
+
         $this->assertNotNull($this->grid($page));
     }
 

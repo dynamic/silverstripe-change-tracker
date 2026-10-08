@@ -45,3 +45,12 @@ next change, the permission code derived from the admin class. No golden file ch
 - `DataChangeAdminTest::testNoPermission403`: the last step used to show that `CMS_ACCESS_DataChangeAdmin` did not
   open the admin. It now shows that a code derived from the class name does not.
 - `DataChangeAdminTest::testPermissionHolders`: `CMS_ACCESS_DataChangeAdmin` now opens the admin.
+
+## Permission for the Published States tab
+
+- `SiteTreeChangeRecordableTest::testTabVisibleForHolderOfTheLiteralCode` is now
+  `testTabHiddenForHolderOfTheAdminCodeOnly`. The tab used to check the literal code `CMS_ACCESS_DataChangeAdmin`,
+  which the admin did not require, so only administrators and holders of `CMS_ACCESS_LeftAndMain` saw it in practice.
+  Now that the admin requires that code, the tab checks `published_state_permission`, `CMS_ACCESS_LeftAndMain` by
+  default, so the people who see the tab stay the same. Someone holding only the admin's code sees the admin but not
+  the tab, as before. `testTabPermissionIsConfigurable` covers the setting.
