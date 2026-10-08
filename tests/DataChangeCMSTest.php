@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests;
+namespace Dynamic\ChangeTracker\Tests;
 
 use SilverStripe\Dev\FunctionalTest;
 use TypeError;
@@ -15,8 +15,8 @@ class DataChangeCMSTest extends FunctionalTest
         TestTrackedChild::class,
     ];
 
-    private const EDIT_LINK = 'admin/datachanges/Symbiote-DataChange-Model-DataChangeRecord/EditForm/field/'
-        . 'Symbiote-DataChange-Model-DataChangeRecord/item/%d/edit';
+    private const EDIT_LINK = 'admin/datachanges/Dynamic-ChangeTracker-Model-DataChangeRecord/EditForm/field/'
+        . 'Dynamic-ChangeTracker-Model-DataChangeRecord/item/%d/edit';
 
     public function testCMSFieldsShowRequestVars()
     {

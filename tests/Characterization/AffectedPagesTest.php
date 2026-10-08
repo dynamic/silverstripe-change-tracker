@@ -1,14 +1,14 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use SilverStripe\ORM\DB;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Tests\Fixtures\PlainRecordableSubclass;
-use Symbiote\DataChange\Tests\Fixtures\ElementLike;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPageSubclass;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Tests\Fixtures\PlainRecordableSubclass;
+use Dynamic\ChangeTracker\Tests\Fixtures\ElementLike;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPageSubclass;
 
 /**
  * Which pages the site extension attaches to a record, and the ways it gets that wrong

@@ -1,8 +1,8 @@
 <?php
 
-namespace Symbiote\DataChange\Job;
+namespace Dynamic\ChangeTracker\Job;
 
-use Symbiote\DataChange\DataChangeRecord;
+use Dynamic\ChangeTracker\DataChangeRecord;
 
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\Queries\SQLDelete;

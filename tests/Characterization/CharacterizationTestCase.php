@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use ReflectionProperty;
 use SilverStripe\CMS\Model\SiteTree;
@@ -9,22 +9,22 @@ use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\Versioned\Versioned;
-use Symbiote\DataChange\Extension\ChangeRecordable;
-use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Model\TrackedManyManyList;
-use Symbiote\DataChange\Tests\Fixtures\ElementLike;
-use Symbiote\DataChange\Tests\Fixtures\PlainRecordable;
-use Symbiote\DataChange\Tests\Fixtures\PlainRecordableSubclass;
-use Symbiote\DataChange\Tests\Fixtures\ThroughJoin;
-use Symbiote\DataChange\Tests\Fixtures\ThroughOwner;
-use Symbiote\DataChange\Tests\Fixtures\TrackedChild;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPageSubclass;
-use Symbiote\DataChange\Tests\TestTextJSONFieldObject;
-use Symbiote\DataChange\Tests\TestTrackedUnderscoreChild;
-use Symbiote\DataChange\Tests\TestTrackedUnderscoreObject;
+use Dynamic\ChangeTracker\Extension\ChangeRecordable;
+use Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\ORM\TrackedManyManyList;
+use Dynamic\ChangeTracker\Tests\Fixtures\ElementLike;
+use Dynamic\ChangeTracker\Tests\Fixtures\PlainRecordable;
+use Dynamic\ChangeTracker\Tests\Fixtures\PlainRecordableSubclass;
+use Dynamic\ChangeTracker\Tests\Fixtures\ThroughJoin;
+use Dynamic\ChangeTracker\Tests\Fixtures\ThroughOwner;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedChild;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPageSubclass;
+use Dynamic\ChangeTracker\Tests\TestTextJSONFieldObject;
+use Dynamic\ChangeTracker\Tests\TestTrackedUnderscoreChild;
+use Dynamic\ChangeTracker\Tests\TestTrackedUnderscoreObject;
 
 /**
  * Base class for the characterization tests.
@@ -214,7 +214,7 @@ abstract class CharacterizationTestCase extends FunctionalTest
     }
 
     /**
-     * @return \Symbiote\DataChange\Service\DataChangeTrackService
+     * @return \Dynamic\ChangeTracker\Service\DataChangeTrackService
      */
     protected function trackService()
     {

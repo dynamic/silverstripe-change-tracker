@@ -1,12 +1,12 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Fixtures;
+namespace Dynamic\ChangeTracker\Tests\Fixtures;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
-use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
+use Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable;
 
 /**
  * A versioned record tracked the way the sites track their own models

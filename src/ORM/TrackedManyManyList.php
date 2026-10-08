@@ -1,10 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Model;
+namespace Dynamic\ChangeTracker\ORM;
 
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\DataObject;
-use Symbiote\DataChange\Service\LiveLastEditedPropagator;
+use Dynamic\ChangeTracker\Service\LiveLastEditedPropagator;
 
 /**
  * A replacement manymany list that tracks add and remove calls
@@ -57,7 +57,7 @@ class TrackedManyManyList extends ManyManyList
         }
         $parts = explode('_', $joinName);
         if (isset($parts[0]) && count($parts) > 1) {
-            // table name could be sometihng like Symbiote_DataChange_Tests_TestObject_Kids
+            // table name could be sometihng like Dynamic_ChangeTracker_Tests_TestObject_Kids
             // which is ClassName_RelName, with
             $tableName = $parts;
             $relationName = array_pop($tableName);

@@ -1,9 +1,9 @@
 <?php
 
-namespace Symbiote\DataChange\Extension;
+namespace Dynamic\ChangeTracker\Extension;
 
-use Symbiote\DataChange\Service\DataChangeTrackService;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\DataChangeTrackService;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Core\Config\Config;
 

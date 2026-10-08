@@ -1,12 +1,12 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use DNADesign\Elemental\Extensions\ElementalPageExtension;
 use DNADesign\Elemental\Models\BaseElement;
 use DNADesign\Elemental\Models\ElementContent;
 use DNADesign\Elemental\Models\ElementalArea;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
 /**
  * The element branch of the affected pages lookup. It needs the elemental module and is skipped without it.

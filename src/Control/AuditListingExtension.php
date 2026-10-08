@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Control;
+namespace Dynamic\ChangeTracker\Control;
 
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;

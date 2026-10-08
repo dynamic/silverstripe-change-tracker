@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use PHPUnit\Framework\Assert;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
 
 /**
  * The columns and helper methods the site extension adds to the Data Changes grid

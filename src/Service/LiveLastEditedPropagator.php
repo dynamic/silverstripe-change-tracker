@@ -1,13 +1,13 @@
 <?php
 
-namespace Symbiote\DataChange\Service;
+namespace Dynamic\ChangeTracker\Service;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Queries\SQLUpdate;
 use SilverStripe\Versioned\Versioned;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
 /**
  * Copies the time of a change onto the live row of the pages it affects, so that a page reports a fresh LastEdited

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Model;
+namespace Dynamic\ChangeTracker\Model;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\DataObject;
@@ -81,7 +81,7 @@ class DataChangeRecord extends DataObject
 
     public function getCMSFields($params = null)
     {
-        Requirements::css('symbiote/silverstripe-datachange-tracker: client/css/datachange-tracker.css');
+        Requirements::css('dynamic/silverstripe-change-tracker: client/css/datachange-tracker.css');
 
         $fields = FieldList::create(
             ToggleCompositeField::create(

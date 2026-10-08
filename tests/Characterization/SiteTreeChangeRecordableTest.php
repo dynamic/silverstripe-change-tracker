@@ -1,12 +1,12 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
 /**
  * The published states tab and the publish hooks of SiteTreeChangeRecordable

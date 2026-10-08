@@ -1,12 +1,12 @@
 <?php
 
-namespace Symbiote\DataChange\Extension;
+namespace Dynamic\ChangeTracker\Extension;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
-use Symbiote\DataChange\Service\AffectedPagesService;
-use Symbiote\DataChange\Service\LiveLastEditedPropagator;
+use Dynamic\ChangeTracker\Service\AffectedPagesService;
+use Dynamic\ChangeTracker\Service\LiveLastEditedPropagator;
 use WeakMap;
 
 /**

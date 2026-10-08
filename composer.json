@@ -1,36 +1,52 @@
 {
-    "name": "symbiote/silverstripe-datachange-tracker",
-    "description": "Record and track changes to any dataobjects. View chages/diffs in model admin.",
+    "name": "dynamic/silverstripe-change-tracker",
+    "description": "Records changes to data objects and many_many relations, with the pages each change affects, and shows them in the CMS.",
     "type": "silverstripe-vendormodule",
-    "keywords": ["silverstripe", "data", "tracker"],
-    "homepage": "http://github.com/symbiote/silverstripe-datachange-tracker",
+    "license": "BSD-3-Clause",
+    "keywords": ["silverstripe", "data", "tracker", "audit", "change log"],
+    "homepage": "https://github.com/dynamic/silverstripe-change-tracker",
     "authors": [
         {
+            "name": "Dynamic",
+            "email": "dev@dynamicagency.com",
+            "homepage": "https://www.dynamicagency.com"
+        },
+        {
             "name": "Marcus Nyeholt",
-            "email": "marcus@symbiote.com.au"
+            "email": "marcus@symbiote.com.au",
+            "role": "Original author"
         }
     ],
     "require": {
         "php": "^8.1",
-        "silverstripe/framework": "^5.3"
+        "silverstripe/framework": "^5.3",
+        "silverstripe/cms": "^5.3",
+        "silverstripe/versioned": "^2.3",
+        "silverstripe/admin": "^2.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.6"
+        "silverstripe/recipe-testing": "^3",
+        "dnadesign/silverstripe-elemental": "^5",
+        "symbiote/silverstripe-queuedjobs": "^5"
+    },
+    "suggest": {
+        "dnadesign/silverstripe-elemental": "Pages are found for changes to content blocks",
+        "symbiote/silverstripe-queuedjobs": "Old change records can be pruned by a nightly job"
+    },
+    "conflict": {
+        "symbiote/silverstripe-datachange-tracker": "*",
+        "sheadawson/silverstripe-datachange-tracker": "*",
+        "silverstripe-australia/datachange-tracker": "*"
     },
     "extra": {
         "expose": [
             "client"
-        ],
-        "installer-name": "datachange-tracker"
-    },
-    "replace": {
-        "sheadawson/silverstripe-datachange-tracker": "self.version",
-        "silverstripe-australia/datachange-tracker": "self.version"
+        ]
     },
     "autoload": {
         "psr-4": {
-            "Symbiote\\DataChange\\": "src/",
-            "Symbiote\\DataChange\\Tests\\": "tests/"
+            "Dynamic\\ChangeTracker\\": "src/",
+            "Dynamic\\ChangeTracker\\Tests\\": "tests/"
         }
     },
     "prefer-stable": true,
