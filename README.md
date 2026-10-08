@@ -11,7 +11,7 @@ It continues [symbiote/silverstripe-datachange-tracker](https://github.com/symbi
 | Line | Silverstripe CMS | PHP | Status |
 |---|---|---|---|
 | `1` | 5 (`silverstripe/framework` ^5.3, `silverstripe/cms` ^5.3) | ^8.1 | Current. Version `1.0.0` is not tagged yet; develop on `1.x-dev`. |
-| `2` | 6 | 8.3 or later (to be confirmed when line `2` is cut) | Not released. Same class names as line `1`. |
+| `2` | 6 (`silverstripe/framework` ^6, `silverstripe/cms` ^6) | 8.3 or later | Not released. Same class names as line `1`. The suite runs on PHPUnit 11. |
 
 Optional modules:
 
@@ -204,7 +204,8 @@ example `/about-us/listpages`.
 
 ## Testing
 
-The suite needs a Silverstripe 5 project around the module, and a database user that can create databases:
+The suite needs a Silverstripe project around the module (5 on line `1`, 6 on line `2`), and a database user that can
+create databases:
 
 ```
 vendor/bin/phpunit

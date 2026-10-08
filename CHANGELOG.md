@@ -4,6 +4,50 @@ All notable changes to this module are listed here. The module follows [Semantic
 
 Line `1` supports Silverstripe CMS 5, line `2` Silverstripe CMS 6. Class names are the same on both lines.
 
+## 2.0.0 (unreleased)
+
+Line `2` for Silverstripe CMS 6. Class names, table names and configuration are the same as line `1`, so a site moves
+by changing the constraint from `^1.0` to `^2.0`. The characterization goldens are byte-identical on both lines.
+
+### Requirements
+
+- `silverstripe/framework` `^6`, `silverstripe/cms` `^6`, `silverstripe/versioned` `^3`, `silverstripe/admin` `^3`.
+- PHP `^8.3`.
+- Development: `silverstripe/recipe-testing` `^4` (PHPUnit 11), `dnadesign/silverstripe-elemental` `^6` and
+  `symbiote/silverstripe-queuedjobs` `^6`.
+
+### Changed
+
+- The extensions (`ChangeRecordable`, `SiteTreeChangeRecordable`, `DataChangeRecordExtension`,
+  `LastModifiedExtension` and `AuditListingExtension`) extend `SilverStripe\Core\Extension`. Silverstripe 6 has no
+  `DataExtension`, and its extensions have no parent hooks, so none of them calls `parent::`. They read the record
+  through `getOwner()`.
+- `TrackedManyManyList::add(mixed $item, array $extraFields = []): void`, with `#[\Override]`. Silverstripe 6 declares
+  `add()` without a return value. `remove()` keeps the signature of the parent.
+- `SiteTreeChangeRecordable` adds the Published States tab with `addFieldToTab()`. On Silverstripe 6 `addFieldsToTab()`
+  takes an array of fields.
+- Change records read form field values with `getValue()`. Silverstripe 6 removed `FormField::Value()`.
+- Change records are written with `skipValidation`, after their values are cut to the size of their columns.
+  Silverstripe 6 rejects a value that is too long instead of cutting it. The stored values are the same.
+- `AffectedPagesService` reads a has_one relation as a list of one page. Silverstripe 6 models are not iterable, and
+  Silverstripe 5 iterated them as themselves. The pages found and the rows written are the same.
+- `CleanupDataChangeHistoryTask` is a Silverstripe 6 build task. Its command name is
+  `Dynamic-ChangeTracker-Job-CleanupDataChangeHistoryTask` (run with `sake tasks:` and that name). Its options
+  (`older`, `run` and `force`) are declared with `getOptions()`, and the task runs in `execute()`.
+- `PruneChangesBeforeJob` declares its `priorTo` and `pruneBefore` properties. They stay public, so queued jobs written
+  before the upgrade still unserialise.
+- `phpunit.xml.dist` uses the PHPUnit 11 schema (`source` instead of `coverage`) and keeps `failOnWarning`.
+
+### Intentional behaviour changes (line 2)
+
+- The `run` and `force` options of the history cleanup task are read as booleans, as Silverstripe 6 reads boolean
+  options. `run=false` and `run=no` no longer run the task. Silverstripe 5 treated any non-empty value as set.
+
+### Unchanged
+
+- The tables, the class names, the Injector configuration, and the build migration in `_config/legacy.yml`, which
+  carries the `DbBuild` key that Silverstripe 6 reads.
+
 ## 1.0.0 (unreleased)
 
 First release of `dynamic/silverstripe-change-tracker`. It continues
