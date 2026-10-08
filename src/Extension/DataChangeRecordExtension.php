@@ -148,10 +148,10 @@ class DataChangeRecordExtension extends Extension
 
         if ($record) {
             $currentURL = $record->CurrentURL;
-            $referrer = $record->Referrer;
+            $referer = $record->Referer;
 
-            // Use CurrentURL if available, otherwise use Referrer
-            $pageURL = $currentURL ?: $referrer;
+            // Use CurrentURL if available, otherwise use Referer
+            $pageURL = $currentURL ?: $referer;
             $pageURLs = ''; // This should be a string, not an array
 
             if ($pageURL) {

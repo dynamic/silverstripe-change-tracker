@@ -142,12 +142,17 @@ class PageUrlColumnTest extends CharacterizationTestCase
         // the join rows exist, so a record like this is rendered from them
         $this->assertSame($page->AbsoluteLink(), $this->fresh($record)->PageURL);
 
-        // Without join rows and without a current URL the code reads $record->Referrer, which is not a field
-        // (it is Referer), so the fallback never happens and the answer is the empty one
+        // Without join rows and without a current URL the referer is used, and a CMS edit form URL there names the
+        // page
         $record->AffectedPages()->removeAll();
         $record = $this->fresh($record);
         $record->CurrentURL = '';
         $record->Referer = 'http://tracker.test/admin/pages/edit/EditForm/' . $page->ID . '/field/x';
+        $record->write();
+        $this->assertSame($page->AbsoluteLink(), $this->fresh($record)->PageURL);
+
+        // without either URL there is nothing to go on
+        $record->Referer = '';
         $record->write();
         $this->assertSame('No pages affected', $this->fresh($record)->PageURL);
 

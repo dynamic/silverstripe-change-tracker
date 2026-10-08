@@ -67,3 +67,6 @@ Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names
   list.
 - **No warning when no pages are found.** `track()` passes an empty list to `addMany()` when the affected pages lookup
   returns null, instead of null.
+- **Referer fallback of the Page URL column.** For a change record without AffectedPages rows and without a CurrentURL,
+  the column now falls back to the Referer field, as intended. It read a misspelt `Referrer` property before, which is
+  always empty. `track()` always sets CurrentURL, so records it writes are not affected.
