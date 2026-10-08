@@ -2,6 +2,7 @@
 
 namespace Dynamic\ChangeTracker\Tests\Characterization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CompositeField;
@@ -175,7 +176,7 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
     /**
      * @return array[]
      */
-    public function changeTypeProvider(): array
+    public static function changeTypeProvider(): array
     {
         return [
             'new' => ['new'],
@@ -192,6 +193,7 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
      *
      * @dataProvider changeTypeProvider
      */
+    #[DataProvider('changeTypeProvider')]
     public function testEveryChangeTypeBuildsFields(string $kind)
     {
         $page = $this->makePage('Rendered');
