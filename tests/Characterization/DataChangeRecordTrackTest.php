@@ -347,7 +347,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
         $this->assertNotEmpty($record->CurrentEmail);
     }
 
-    public function testNoMemberWarnsAndStoresZero()
+    public function testNoMemberStoresZeroWithoutWarning()
     {
         $this->logOut();
 
@@ -358,13 +358,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
         $this->assertSame('New', $record->ChangeType);
         $this->assertEquals(0, $record->ChangedByID);
         $this->assertNull($record->CurrentEmail);
-        $this->assertSame(
-            [
-                'DataChangeRecord.php: Attempt to read property "ID" on null',
-                'DataChangeRecord.php: Attempt to read property "ID" on null',
-            ],
-            $this->describeWarnings($this->takeWarnings())
-        );
+        $this->assertSame([], $this->describeWarnings($this->takeWarnings()));
     }
 
     public function testCurrentUrlFromServerVars()

@@ -1,9 +1,8 @@
 # Characterization tests
 
-These tests pin what the module does today, including behaviour that is known to be wrong (warnings when nobody is
-logged in, the tracker cache that never hits, string ids that bypass the "already linked" check, and so on). A change
-that alters an observable result is expected to flip the matching assertion in the same commit and to be listed in the
-changelog.
+These tests pin what the module does today, including behaviour that is known to be wrong (the tracker cache that
+never hits, string ids that bypass the "already linked" check, and so on). A change that alters an observable result is
+expected to flip the matching assertion in the same commit and to be listed in `CHANGES.md`.
 
 ## Support
 

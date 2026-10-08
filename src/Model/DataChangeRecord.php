@@ -39,29 +39,29 @@ class DataChangeRecord extends DataObject
         'GetVars' => 'Text',
         'PostVars' => 'Text',
     ];
-    private static $has_one = array(
-        'ChangedBy' => 'SilverStripe\Security\Member',
-        'ChangeRecord' => 'SilverStripe\ORM\DataObject',
-    );
+    private static $has_one = [
+        'ChangedBy' => Member::class,
+        'ChangeRecord' => DataObject::class
+    ];
 
     private static $many_many = [
         'AffectedPages' => SiteTree::class,
     ];
 
-    private static $summary_fields    = array(
+    private static $summary_fields    = [
         'ChangeType' => 'Change Type',
         'ChangeRecordClass' => 'Record Class',
         'ChangeRecordID' => 'Record ID',
         'ObjectTitle' => 'Record Title',
         'ChangedBy.Title' => 'User',
-        'Created' => 'Modification Date',
-    );
-    private static $searchable_fields = array(
+        'Created' => 'Modification Date'
+    ];
+    private static $searchable_fields = [
         'ChangeType',
         'ObjectTitle',
         'ChangeRecordClass',
-        'ChangeRecordID',
-    );
+        'ChangeRecordID'
+    ];
     private static $default_sort      = 'ID DESC';
 
     /**
@@ -70,8 +70,8 @@ class DataChangeRecord extends DataObject
      * @var boolean
      */
     private static $save_request_vars      = false;
-    private static $field_blacklist        = array('Password');
-    private static $request_vars_blacklist = array('url', 'SecurityID');
+    private static $field_blacklist        = ['Password'];
+    private static $request_vars_blacklist = ['url', 'SecurityID'];
 
     public function getCMSFields($params = null)
     {
@@ -81,7 +81,7 @@ class DataChangeRecord extends DataObject
             ToggleCompositeField::create(
                 'Details',
                 'Details',
-                array(
+                [
                     ReadonlyField::create('ChangeType', 'Type of change'),
                     ReadonlyField::create('ChangeRecordClass', 'Record Class'),
                     ReadonlyField::create('ChangeRecordID', 'Record ID'),
@@ -92,18 +92,18 @@ class DataChangeRecord extends DataObject
                     ReadonlyField::create('CurrentURL', 'URL'),
                     ReadonlyField::create('Referer', 'Referer'),
                     ReadonlyField::create('RemoteIP', 'Remote IP'),
-                    ReadonlyField::create('Agent', 'Agent'),
-                    )
+                    ReadonlyField::create('Agent', 'Agent')
+                ]
             )->setStartClosed(false)->addExtraClass('datachange-field'),
             ToggleCompositeField::create(
                 'RawData',
                 'Raw Data',
-                array(
+                [
                     ReadonlyField::create('Before'),
                     ReadonlyField::create('After'),
                     ReadonlyField::create('GetVars'),
-                    ReadonlyField::create('PostVars'),
-                    )
+                    ReadonlyField::create('PostVars')
+                ]
             )->setStartClosed(false)->addExtraClass('datachange-field')
         );
 
@@ -117,11 +117,11 @@ class DataChangeRecord extends DataObject
 
             // The solr search service injector dependency causes issues with comparison, since it has public variables that are stored in an array.
 
-            $diff->ignoreFields(array('searchService'));
+            $diff->ignoreFields(['searchService']);
             $diffed   = $diff->diffedData();
             $diffText = '';
 
-            $changedFields = array();
+            $changedFields = [];
             foreach ($diffed->toMap() as $field => $prop) {
                 if (is_object($prop)) {
                     continue;
@@ -135,7 +135,7 @@ class DataChangeRecord extends DataObject
                 }
 
                 $changedFields[] = $readOnly        = \SilverStripe\Forms\ReadonlyField::create(
-                    'ChangedField'.$field,
+                    'ChangedField' . $field,
                     $field,
                     DBField::create_field('HTMLText', $prop)
                 );
@@ -153,7 +153,7 @@ class DataChangeRecord extends DataObject
         // Flags fields that cannot be rendered with 'forTemplate'. This prevents bugs where
         // WorkflowService (of AdvancedWorkflow Module) and BlockManager (of Sheadawson/blocks module) get put
         // into a field and break the page.
-        $fieldsToRemove = array();
+        $fieldsToRemove = [];
         foreach ($fields->dataFields() as $field) {
             $value = $field->Value();
             if ($value && is_object($value)) {
@@ -161,7 +161,7 @@ class DataChangeRecord extends DataObject
                     $value,
                     'forTemplate'
                 )) {
-                    $field->setValue('[Missing '.get_class($value).'::forTemplate]');
+                    $field->setValue('[Missing ' . $value::class . '::forTemplate]');
                 }
             }
         }
@@ -216,8 +216,8 @@ class DataChangeRecord extends DataObject
         $this->ObjectTitle       = $changedObject->Title;
         $this->Stage             = Versioned::get_reading_mode();
 
-        $before = array();
-        $after  = array();
+        $before = [];
+        $after  = [];
 
         if ($type != 'Change' && $type != 'New') { // If we are (un)publishing we want to store the entire object
             $before = ($type === 'Unpublish') ? $changedObject->toMap() : null;
@@ -255,27 +255,26 @@ class DataChangeRecord extends DataObject
             $this->PostVars = isset($_POST) ? json_encode($_POST) : null;
         }
 
-        $this->ChangedByID = Security::getCurrentUser()->ID;
-
-        if (Security::getCurrentUser()->ID && Security::getCurrentUser()) {
-            $this->CurrentEmail = Security::getCurrentUser()->Email;
+        if ($member = Security::getCurrentUser()) {
+            $this->ChangedByID = $member->ID;
+            $this->CurrentEmail = $member->Email;
         }
 
         if (isset($_SERVER['SERVER_NAME'])) {
             $protocol = 'http';
             $protocol = isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 'https://' : 'http://';
-            $port = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : '80';
+            $port = $_SERVER['SERVER_PORT'] ?? '80';
 
-            $this->CurrentURL = $protocol.$_SERVER["SERVER_NAME"].":".$port.$_SERVER["REQUEST_URI"];
+            $this->CurrentURL = $protocol . $_SERVER["SERVER_NAME"] . ":" . $port . $_SERVER["REQUEST_URI"];
         } elseif (Director::is_cli()) {
             $this->CurrentURL = 'CLI';
         } else {
             $this->CurrentURL = 'Could not determine current URL';
         }
 
-        $this->RemoteIP = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : (Director::is_cli() ? 'CLI' : 'Unknown remote addr');
-        $this->Referer  = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-        $this->Agent    = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        $this->RemoteIP = $_SERVER['REMOTE_ADDR'] ?? (Director::is_cli() ? 'CLI' : 'Unknown remote addr');
+        $this->Referer  = $_SERVER['HTTP_REFERER'] ?? '';
+        $this->Agent    = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
         $this->write();
 
@@ -299,7 +298,7 @@ class DataChangeRecord extends DataObject
      * */
     public function getTitle()
     {
-        return $this->ChangeRecordClass.' #'.$this->ChangeRecordID;
+        return $this->ChangeRecordClass . ' #' . $this->ChangeRecordID;
     }
 
     /**
@@ -329,7 +328,7 @@ class DataChangeRecord extends DataObject
         //
         // So solve this, we simply only decode to a depth of 1. (rather than the 512 default)
         //
-        $resultJsonData = json_decode($jsonData, true, 1);
+        $resultJsonData = json_decode((string) $jsonData, true, 1);
         return $resultJsonData;
     }
 }
