@@ -1,11 +1,11 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use SilverStripe\Core\Injector\Injector;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Service\AffectedPagesService;
-use Symbiote\DataChange\Tests\Fixtures\CountingAffectedPagesService;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\AffectedPagesService;
+use Dynamic\ChangeTracker\Tests\Fixtures\CountingAffectedPagesService;
 
 /**
  * How often the affected pages lookup runs. Each run scans every page in the site.

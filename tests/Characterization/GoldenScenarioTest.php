@@ -1,10 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use SilverStripe\Versioned\Versioned;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
 /**
  * Scripted scenarios whose stored records are compared with golden files recorded from the module before it was

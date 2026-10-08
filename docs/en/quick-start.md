@@ -5,7 +5,7 @@ Add the ChangeRecordable extension to the dataobjects you wish to track
 ```
 MyDataObject:
   extensions:
-    - Symbiote\DataChange\Extension\ChangeRecordable
+    - Dynamic\ChangeTracker\Extension\ChangeRecordable
 ```
 
 If you are applying the extension to the SiteTree, use the SiteTreeChangeRecordable
@@ -20,7 +20,7 @@ For example
 ```
 SilverStripe\Core\Injector\Injector:
   SilverStripe\ORM\ManyManyList:
-    class: Symbiote\DataChange\Model\TrackedManyManyList
+    class: Dynamic\ChangeTracker\ORM\TrackedManyManyList
     properties:
       trackedRelationships:
         - Page_Regions
@@ -41,7 +41,7 @@ private static $many_many = array(
 Set the `save_request_vars` option to 1, and GET and POST vars will be recorded too.
 
 ```
-Symbiote\DataChange\Model\DataChangeRecord:
+Dynamic\ChangeTracker\Model\DataChangeRecord:
   save_request_vars: 1
 
 ```
@@ -52,7 +52,7 @@ Symbiote\DataChange\Model\DataChangeRecord:
 In some cases it may not be desirable to track changes to all fields of an object. You can define ignored fields in your yml config like so:
 
 ```
-Symbiote\DataChange\Extension\ChangeRecordable:
+Dynamic\ChangeTracker\Extension\ChangeRecordable:
   ignored_fields:
     NameOfObjectClass:
       - NameOfField
@@ -61,7 +61,7 @@ Symbiote\DataChange\Extension\ChangeRecordable:
 Or, for the same field name across all objects
 
 ```
-Symbiote\DataChange\Model\DataChangeRecord:
+Dynamic\ChangeTracker\Model\DataChangeRecord:
   field_blacklist:
     - Password
     - Email
@@ -71,7 +71,7 @@ Symbiote\DataChange\Model\DataChangeRecord:
 Also, you may wish to blacklist some request variables from being stored
 
 ```
-Symbiote\DataChange\Model\DataChangeRecord:
+Dynamic\ChangeTracker\Model\DataChangeRecord:
   request_vars_blacklist:
     - url
     - SecurityID
@@ -94,8 +94,8 @@ TeamMember:
     - 'Position'
     - 'Mobile'
   extensions:
-    - 'Symbiote\DataChange\Extension\ChangeRecordable'
-    - 'Symbiote\DataChange\Extension\SignificantChangeRecordable'
+    - 'Dynamic\ChangeTracker\Extension\ChangeRecordable'
+    - 'Dynamic\ChangeTracker\Extension\SignificantChangeRecordable'
 ```
 
 ## Pruning old data

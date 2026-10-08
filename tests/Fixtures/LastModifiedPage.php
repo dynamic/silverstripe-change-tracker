@@ -1,10 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Fixtures;
+namespace Dynamic\ChangeTracker\Tests\Fixtures;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Dev\TestOnly;
-use Symbiote\DataChange\Extension\LastModifiedExtension;
+use Dynamic\ChangeTracker\Extension\LastModifiedExtension;
 
 /**
  * A page that adds its last-modified meta tags through LastModifiedExtension, in the same place as the sites did

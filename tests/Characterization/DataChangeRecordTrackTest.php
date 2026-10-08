@@ -1,17 +1,17 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use ReflectionProperty;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
-use Symbiote\DataChange\Extension\ChangeRecordable;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Tests\Fixtures\PlainRecordable;
-use Symbiote\DataChange\Tests\Fixtures\TrackedChild;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Extension\ChangeRecordable;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Tests\Fixtures\PlainRecordable;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedChild;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
 /**
  * What DataChangeRecord::track() and the extensions that call it store today

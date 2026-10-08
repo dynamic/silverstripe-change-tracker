@@ -1,11 +1,11 @@
 <?php
 
-namespace Symbiote\DataChange\Tests;
+namespace Dynamic\ChangeTracker\Tests;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\FieldType\DBText;
-use Symbiote\DataChange\Extension\ChangeRecordable;
+use Dynamic\ChangeTracker\Extension\ChangeRecordable;
 
 class TestTextJSONFieldObject extends DataObject implements TestOnly
 {

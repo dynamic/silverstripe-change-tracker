@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use InvalidArgumentException;
 use SilverStripe\Core\Injector\Injector;
@@ -9,12 +9,12 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ManyManyThroughList;
 use SilverStripe\Security\Security;
-use Symbiote\DataChange\Model\TrackedManyManyList;
-use Symbiote\DataChange\Tests\Fixtures\ThroughOwner;
-use Symbiote\DataChange\Tests\Fixtures\TrackedChild;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
-use Symbiote\DataChange\Tests\TestTrackedUnderscoreChild;
-use Symbiote\DataChange\Tests\TestTrackedUnderscoreObject;
+use Dynamic\ChangeTracker\ORM\TrackedManyManyList;
+use Dynamic\ChangeTracker\Tests\Fixtures\ThroughOwner;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedChild;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Tests\TestTrackedUnderscoreChild;
+use Dynamic\ChangeTracker\Tests\TestTrackedUnderscoreObject;
 
 /**
  * What the replacement many_many list records today
@@ -302,10 +302,10 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $this->resetTracking();
         $kid = TestTrackedUnderscoreChild::create(['Title' => 'underscore kid']);
         $kid->write();
-        $this->trackRelationships(['Symbiote_DataChange_Tests_TestTrackedUnderscoreObject_Kids']);
+        $this->trackRelationships(['Dynamic_ChangeTracker_Tests_TestTrackedUnderscoreObject_Kids']);
 
         $this->assertSame(
-            'Symbiote_DataChange_Tests_TestTrackedUnderscoreObject_Kids',
+            'Dynamic_ChangeTracker_Tests_TestTrackedUnderscoreObject_Kids',
             $owner->Kids()->getJoinTable()
         );
         $owner->Kids()->add($kid);

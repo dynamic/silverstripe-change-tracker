@@ -3,5 +3,5 @@ Name: datachange_elemental
 Only:
   classexists: DNADesign\Elemental\Models\BaseElement
 ---
-Symbiote\DataChange\Service\AffectedPagesService:
+Dynamic\ChangeTracker\Service\AffectedPagesService:
   element_class: DNADesign\Elemental\Models\BaseElement

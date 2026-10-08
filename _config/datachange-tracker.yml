@@ -3,17 +3,17 @@ Name: datachange_injector_config
 ---
 SilverStripe\Core\Injector\Injector:
   DataChangeTrackService:
-    class: \Symbiote\DataChange\Service\DataChangeTrackService
-  Symbiote\DataChange\Extension\ChangeRecordable:
+    class: \Dynamic\ChangeTracker\Service\DataChangeTrackService
+  Dynamic\ChangeTracker\Extension\ChangeRecordable:
     properties:
       dataChangeTrackService: "%$DataChangeTrackService"
-  Symbiote\DataChange\Extension\SiteTreeChangeRecordable:
+  Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable:
     properties:
       dataChangeTrackService: "%$DataChangeTrackService"
   # many_many add and remove calls are recorded for the join tables listed in trackedRelationships (none by default)
   SilverStripe\ORM\ManyManyList:
-    class: Symbiote\DataChange\Model\TrackedManyManyList
+    class: Dynamic\ChangeTracker\ORM\TrackedManyManyList
 
-Symbiote\DataChange\Model\DataChangeRecord:
+Dynamic\ChangeTracker\Model\DataChangeRecord:
   extensions:
-    changeRecordExtension: Symbiote\DataChange\Extension\DataChangeRecordExtension
+    changeRecordExtension: Dynamic\ChangeTracker\Extension\DataChangeRecordExtension

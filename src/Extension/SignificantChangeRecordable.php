@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Extension;
+namespace Dynamic\ChangeTracker\Extension;
 
 use DateTime;
 

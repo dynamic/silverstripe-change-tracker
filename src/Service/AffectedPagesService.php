@@ -1,11 +1,11 @@
 <?php
 
-namespace Symbiote\DataChange\Service;
+namespace Dynamic\ChangeTracker\Service;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
 /**
  * Works out which pages a change record affects.

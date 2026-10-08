@@ -1,17 +1,17 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use ReflectionMethod;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use Symbiote\DataChange\Extension\LastModifiedExtension;
-use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
-use Symbiote\DataChange\Tests\Fixtures\LastModifiedPage;
-use Symbiote\DataChange\Tests\Fixtures\LegacyLastModifiedPage;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Extension\LastModifiedExtension;
+use Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable;
+use Dynamic\ChangeTracker\Tests\Fixtures\LastModifiedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\LegacyLastModifiedPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
 /**
  * LastModifiedExtension gives the same meta tags, in the same place, as the page code the sites carried. Every test

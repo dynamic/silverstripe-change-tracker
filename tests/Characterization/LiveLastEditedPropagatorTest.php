@@ -1,13 +1,13 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Service\LiveLastEditedPropagator;
-use Symbiote\DataChange\Tests\Fixtures\LegacySiteDataChangeRecordExtension;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPage;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\LiveLastEditedPropagator;
+use Dynamic\ChangeTracker\Tests\Fixtures\LegacySiteDataChangeRecordExtension;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPage;
 
 /**
  * The live LastEdited update writes the same rows and values as the raw query the sites ran

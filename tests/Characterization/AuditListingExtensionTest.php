@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use ReflectionMethod;
 use SilverStripe\Assets\Dev\TestAssetStore;
@@ -12,11 +12,11 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use Symbiote\DataChange\Control\AuditListingExtension;
-use Symbiote\DataChange\Tests\Fixtures\AuditPage;
-use Symbiote\DataChange\Tests\Fixtures\AuditPageController;
-use Symbiote\DataChange\Tests\Fixtures\LegacyAuditPage;
-use Symbiote\DataChange\Tests\Fixtures\LegacyAuditPageController;
+use Dynamic\ChangeTracker\Control\AuditListingExtension;
+use Dynamic\ChangeTracker\Tests\Fixtures\AuditPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\AuditPageController;
+use Dynamic\ChangeTracker\Tests\Fixtures\LegacyAuditPage;
+use Dynamic\ChangeTracker\Tests\Fixtures\LegacyAuditPageController;
 
 /**
  * The review listings answer the same requests with the same responses as the page controller code the sites carried.

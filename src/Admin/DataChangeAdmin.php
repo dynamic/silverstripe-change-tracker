@@ -1,9 +1,9 @@
 <?php
 
-namespace Symbiote\DataChange\Admin;
+namespace Dynamic\ChangeTracker\Admin;
 
 use SilverStripe\Admin\ModelAdmin;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
 /**
  * @author marcus@symbiote.com.au

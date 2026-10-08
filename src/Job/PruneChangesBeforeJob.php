@@ -1,12 +1,12 @@
 <?php
 
-namespace Symbiote\DataChange\Job;
+namespace Dynamic\ChangeTracker\Job;
 
 use SilverStripe\ORM\Queries\SQLDelete;
 use SilverStripe\Core\Injector\Injector;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
 if (!class_exists(AbstractQueuedJob::class)) {
     return;

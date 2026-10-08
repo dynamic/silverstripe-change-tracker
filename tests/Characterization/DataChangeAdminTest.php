@@ -1,9 +1,9 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
-use Symbiote\DataChange\Admin\DataChangeAdmin;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Admin\DataChangeAdmin;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
 /**
  * The Data Changes screen in the CMS
@@ -13,7 +13,7 @@ class DataChangeAdminTest extends CharacterizationTestCase
     /**
      * @var string
      */
-    private const RECORD_PATH = 'Symbiote-DataChange-Model-DataChangeRecord';
+    private const RECORD_PATH = 'Dynamic-ChangeTracker-Model-DataChangeRecord';
 
     protected function setUp(): void
     {
@@ -116,9 +116,9 @@ class DataChangeAdminTest extends CharacterizationTestCase
         $admin = DataChangeAdmin::singleton();
 
         // The code is derived from the class name, so renaming the class renames the permission
-        $this->assertSame('CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin', $admin->getRequiredPermissions());
+        $this->assertSame('CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin', $admin->getRequiredPermissions());
         $this->assertArrayHasKey(
-            'CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin',
+            'CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin',
             $admin->providePermissions()
         );
         $this->assertSame('datachanges', DataChangeAdmin::config()->get('url_segment'));
@@ -159,7 +159,7 @@ class DataChangeAdminTest extends CharacterizationTestCase
     {
         $this->changeRecord();
 
-        $this->logInWithPermission('CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin');
+        $this->logInWithPermission('CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin');
         $this->assertSame(200, $this->get('admin/datachanges')->getStatusCode());
 
         // any CMS user with access to every section can open it

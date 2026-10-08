@@ -1,10 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Fixtures;
+namespace Dynamic\ChangeTracker\Tests\Fixtures;
 
 use SilverStripe\Dev\TestOnly;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Service\AffectedPagesService;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\AffectedPagesService;
 
 /**
  * The affected pages lookup with a call counter

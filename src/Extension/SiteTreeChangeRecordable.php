@@ -1,8 +1,8 @@
 <?php
 
-namespace Symbiote\DataChange\Extension;
+namespace Dynamic\ChangeTracker\Extension;
 
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Permission;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injector;
@@ -9,12 +9,12 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use TypeError;
-use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Tests\Fixtures\CmsFieldsProbeExtension;
-use Symbiote\DataChange\Tests\Fixtures\ObjectValueReadonlyField;
-use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
-use Symbiote\DataChange\Tests\TestTextJSONFieldObject;
+use Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Tests\Fixtures\CmsFieldsProbeExtension;
+use Dynamic\ChangeTracker\Tests\Fixtures\ObjectValueReadonlyField;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
+use Dynamic\ChangeTracker\Tests\TestTextJSONFieldObject;
 
 /**
  * The read-only screen built by DataChangeRecord::getCMSFields()

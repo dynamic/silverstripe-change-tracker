@@ -1,10 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Fixtures;
+namespace Dynamic\ChangeTracker\Tests\Fixtures;
 
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
-use Symbiote\DataChange\Extension\ChangeRecordable;
+use Dynamic\ChangeTracker\Extension\ChangeRecordable;
 
 /**
  * Stands in for an element: it has no relation to a page but answers getPage()

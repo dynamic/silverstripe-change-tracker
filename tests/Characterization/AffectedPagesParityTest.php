@@ -1,13 +1,13 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Characterization;
+namespace Dynamic\ChangeTracker\Tests\Characterization;
 
-use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Service\AffectedPagesService;
-use Symbiote\DataChange\Tests\Fixtures\ElementLike;
-use Symbiote\DataChange\Tests\Fixtures\LegacySiteDataChangeRecordExtension;
-use Symbiote\DataChange\Tests\Fixtures\PlainRecordableSubclass;
-use Symbiote\DataChange\Tests\Fixtures\TrackedPageSubclass;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\AffectedPagesService;
+use Dynamic\ChangeTracker\Tests\Fixtures\ElementLike;
+use Dynamic\ChangeTracker\Tests\Fixtures\LegacySiteDataChangeRecordExtension;
+use Dynamic\ChangeTracker\Tests\Fixtures\PlainRecordableSubclass;
+use Dynamic\ChangeTracker\Tests\Fixtures\TrackedPageSubclass;
 
 /**
  * The module's affected pages lookup gives the same answer as the copy the sites carried, key for key, for every

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests\Fixtures;
+namespace Dynamic\ChangeTracker\Tests\Fixtures;
 
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;

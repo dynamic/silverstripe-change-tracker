@@ -1,8 +1,8 @@
 <?php
 
-namespace Symbiote\DataChange\Service;
+namespace Dynamic\ChangeTracker\Service;
 
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
 use SilverStripe\ORM\DataObject;
 
