@@ -10,3 +10,10 @@ SilverStripe\Core\Injector\Injector:
   Symbiote\DataChange\Extension\SiteTreeChangeRecordable:
     properties:
       dataChangeTrackService: "%$DataChangeTrackService"
+  # many_many add and remove calls are recorded for the join tables listed in trackedRelationships (none by default)
+  SilverStripe\ORM\ManyManyList:
+    class: Symbiote\DataChange\Model\TrackedManyManyList
+
+Symbiote\DataChange\Model\DataChangeRecord:
+  extensions:
+    changeRecordExtension: Symbiote\DataChange\Extension\DataChangeRecordExtension

@@ -2,62 +2,54 @@
 
 namespace Symbiote\DataChange\Tests\Characterization;
 
-use SilverStripe\CMS\Model\SiteTree;
-use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
+use SilverStripe\Core\Injector\Injector;
 use Symbiote\DataChange\Model\DataChangeRecord;
-use Symbiote\DataChange\Tests\Fixtures\CountingLegacySiteDataChangeRecordExtension;
+use Symbiote\DataChange\Service\AffectedPagesService;
+use Symbiote\DataChange\Tests\Fixtures\CountingAffectedPagesService;
 
 /**
  * How often the affected pages lookup runs. Each run scans every page in the site.
  */
 class AffectedPagesLookupCountTest extends CharacterizationTestCase
 {
-    protected static $required_extensions = [
-        SiteTree::class => [
-            SiteTreeChangeRecordable::class,
-        ],
-        DataChangeRecord::class => [
-            CountingLegacySiteDataChangeRecordExtension::class,
-        ],
-    ];
-
     protected function setUp(): void
     {
         parent::setUp();
-        CountingLegacySiteDataChangeRecordExtension::$lookups = 0;
+        Injector::inst()->registerService(new CountingAffectedPagesService(), AffectedPagesService::class);
+        CountingAffectedPagesService::$lookups = 0;
     }
 
     public function testComputedOncePerRecordForAChange()
     {
         $object = $this->makeObject('Counted');
-        CountingLegacySiteDataChangeRecordExtension::$lookups = 0;
+        CountingAffectedPagesService::$lookups = 0;
 
         $object->Title = 'Counted, renamed';
         $object->write();
 
-        $this->assertSame(1, CountingLegacySiteDataChangeRecordExtension::$lookups);
+        $this->assertSame(1, CountingAffectedPagesService::$lookups);
     }
 
-    public function testComputedTwicePerPublishOfARecordThatIsNotAPage()
+    public function testComputedOncePerPublishOfARecordThatIsNotAPage()
     {
         $object = $this->makeObject('Counted publish');
-        CountingLegacySiteDataChangeRecordExtension::$lookups = 0;
+        CountingAffectedPagesService::$lookups = 0;
 
         $object->publishRecursive();
 
-        // once in the extension's onAfterWrite, to bump the live page, and once in track()
+        // the update of the live page after the write and the join rows written by track() share one lookup
         $this->assertSame('Publish', $this->lastRecord()->ChangeType);
-        $this->assertSame(2, CountingLegacySiteDataChangeRecordExtension::$lookups);
+        $this->assertSame(1, CountingAffectedPagesService::$lookups);
     }
 
     public function testComputedOncePerPublishOfAPage()
     {
         $page = $this->makePage('Counted page');
-        CountingLegacySiteDataChangeRecordExtension::$lookups = 0;
+        CountingAffectedPagesService::$lookups = 0;
 
         $page->publishRecursive();
 
-        $this->assertSame(1, CountingLegacySiteDataChangeRecordExtension::$lookups);
+        $this->assertSame(1, CountingAffectedPagesService::$lookups);
     }
 
     public function testRenderingTheColumnLooksUpAgainForRecordsWithoutJoinRows()
@@ -66,11 +58,11 @@ class AffectedPagesLookupCountTest extends CharacterizationTestCase
         $plain->Notes = 'changed';
         $plain->write();
         $record = DataChangeRecord::get()->byID($this->lastRecord()->ID);
-        CountingLegacySiteDataChangeRecordExtension::$lookups = 0;
+        CountingAffectedPagesService::$lookups = 0;
 
         $record->PageURL;
 
-        $this->assertSame(1, CountingLegacySiteDataChangeRecordExtension::$lookups);
+        $this->assertSame(1, CountingAffectedPagesService::$lookups);
     }
 
     public function testRenderingTheColumnDoesNotLookUpForRecordsWithJoinRows()
@@ -79,10 +71,26 @@ class AffectedPagesLookupCountTest extends CharacterizationTestCase
         $page->Title = 'Has a record, renamed';
         $page->write();
         $record = DataChangeRecord::get()->byID($this->lastRecord()->ID);
-        CountingLegacySiteDataChangeRecordExtension::$lookups = 0;
+        CountingAffectedPagesService::$lookups = 0;
 
         $record->PageURL;
 
-        $this->assertSame(0, CountingLegacySiteDataChangeRecordExtension::$lookups);
+        $this->assertSame(0, CountingAffectedPagesService::$lookups);
+    }
+
+    public function testAWriteOfTheSameRecordObjectLooksUpAgain()
+    {
+        $plain = $this->makePlain('Tracked twice');
+        $record = DataChangeRecord::create();
+        $plain->Notes = 'one';
+        $record->track($plain, 'Change');
+        CountingAffectedPagesService::$lookups = 0;
+
+        $record->getAffectedPageRecords();
+        $this->assertSame(0, CountingAffectedPagesService::$lookups, 'Kept from track()');
+
+        $record->write();
+        $record->getAffectedPageRecords();
+        $this->assertSame(1, CountingAffectedPagesService::$lookups, 'Dropped by the write');
     }
 }

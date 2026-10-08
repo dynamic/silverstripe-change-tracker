@@ -10,9 +10,11 @@ expected to flip the matching assertion in the same commit and to be listed in `
   captures warnings with an error handler instead of letting the runner convert them, and fails a test that leaves a
   warning unclaimed. Tracked records are created inside the tests after an administrator has been logged in, never from
   a fixture file.
-- `../Fixtures` holds the test-only data objects. `LegacySiteDataChangeRecordExtension` is the site-level extension
-  that adds the page URL column, the affected pages and the live `LastEdited` update. It is kept as the sites carry it
-  and is applied to `DataChangeRecord` through `$required_extensions`.
+- `../Fixtures` holds the test-only data objects. The `Legacy*` fixtures are the code the sites carried before the
+  module took it over, copied without changes: `LegacySiteDataChangeRecordExtension` (page URL column, affected pages,
+  live `LastEdited` update), `LegacyLastModifiedPage` (last-modified meta tags) and `LegacyAuditPageController`
+  (review listings). The tests run against the module's own classes and use these copies only as the reference that
+  the module's output is compared with.
 - `GoldenFile` compares a value with a file in `golden/`. Class names from the test namespaces are shortened, ids are
   replaced by labels, and payloads are reduced to fields declared by the fixtures, so the files do not depend on
   timestamps, auto increment values or core columns.
