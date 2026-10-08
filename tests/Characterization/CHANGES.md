@@ -62,3 +62,22 @@ next change, the permission code derived from the admin class. No golden file ch
   their column size by characters, which keeps exactly what the database kept when it cut them.
 - New: `testTrackCutsValuesBeforeWriting` shows the record object holds the cut values, and
   `testObjectTitleNonStringCast` now also checks the in-memory title is the string `'42'`.
+
+## Ids given to TrackedManyManyList::add()
+
+`add()` used `is_int()` to tell an id from a record and read `->ID` on anything else, so a numeric string id raised a
+warning, missed the "already linked" check, and an int id missed the extra data comparison.
+
+- `TrackedManyManyListTest::testAddNumericStringId`: a numeric string id of an item that is already linked is no longer
+  recorded a second time, and no warning is raised.
+- `TrackedManyManyListTest::testAddExistingByIdAlwaysRecords` is now `testAddExistingByIdComparesTheStoredExtraData`:
+  an id with unchanged extra data records nothing, as a record object already did; changed extra data is recorded.
+- `TrackedManyManyListTest::testSetByIdListWithStringIdsWarns` is now `testSetByIdListWithStringIds`: the same rows are
+  recorded, without the warnings.
+- No golden file changed.
+
+## No lookup for joins that are not tracked
+
+- `TrackedManyManyListTest::testUntrackedJoinNoRecordButByIdQueryStillRuns` is now
+  `testUntrackedJoinNoRecordAndNoByIdQuery`. `add()` checks whether the join table is tracked before it looks the item
+  up, so an add to any other many_many relation runs the same queries as the stock list. Nothing recorded changes.
