@@ -4,6 +4,7 @@ namespace Dynamic\ChangeTracker\Tests\Characterization;
 
 use ReflectionProperty;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\ORM\DB;
 use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
 use Dynamic\ChangeTracker\Extension\ChangeRecordable;
@@ -463,6 +464,84 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
         $this->assertSame([], $this->takeWarnings());
     }
 
+    /**
+     * Values longer than the column keep the characters the database would keep, multibyte ones included
+     *
+     * @dataProvider longValueProvider
+     */
+    public function testLongMultibyteValuesMatchDatabaseTruncation(string $field, int $limit)
+    {
+        $long = str_repeat('é€', 150) . str_repeat('x', 100);
+        $title = 'Long';
+        switch ($field) {
+            case 'ObjectTitle':
+                $title = $long;
+                break;
+            case 'CurrentURL':
+                $_SERVER['REQUEST_URI'] = '/' . $long;
+                break;
+            case 'Referer':
+                $_SERVER['HTTP_REFERER'] = 'http://r.test/' . $long;
+                break;
+            case 'Agent':
+                $_SERVER['HTTP_USER_AGENT'] = $long;
+                break;
+            case 'RemoteIP':
+                $_SERVER['REMOTE_ADDR'] = $long;
+                break;
+        }
+
+        if ($field === 'ChangeType') {
+            $object = $this->makeObject('Owner');
+            $sent = 'Custom ' . $long;
+            $this->trackService()->track($object, $sent);
+            $record = $this->lastRecord();
+        } else {
+            $plain = $this->makePlain($title);
+            $record = $this->recordsFor($plain)[0];
+            $sent = [
+                'ObjectTitle' => $title,
+                'CurrentURL' => 'http://tracker.test:8080/' . $long,
+                'Referer' => 'http://r.test/' . $long,
+                'Agent' => $long,
+                'RemoteIP' => $long,
+            ][$field];
+        }
+
+        // what the database keeps when it is handed the full value
+        $probe = $this->makePlain('Probe');
+        $probeRecord = $this->recordsFor($probe)[0];
+        DB::prepared_query(
+            'UPDATE "DataChangeRecord" SET "' . $field . '" = ? WHERE "ID" = ?',
+            [$sent, $probeRecord->ID]
+        );
+        $databaseKept = DB::prepared_query(
+            'SELECT "' . $field . '" FROM "DataChangeRecord" WHERE "ID" = ?',
+            [$probeRecord->ID]
+        )->value();
+
+        $this->assertSame($limit, mb_strlen($databaseKept));
+        $this->assertSame($databaseKept, $record->$field);
+        $this->assertSame([], $this->takeWarnings());
+    }
+
+    public function testTrackCutsValuesBeforeWriting()
+    {
+        $plain = $this->makePlain(str_repeat('é', 300));
+        $_SERVER['HTTP_USER_AGENT'] = str_repeat('a', 300);
+        $_SERVER['REMOTE_ADDR'] = str_repeat('1', 300);
+
+        $plain->Notes = 'changed';
+        $record = DataChangeRecord::create()->track($plain, 'Change ' . str_repeat('c', 300));
+
+        // the record object holds the stored values, not the longer ones it was given
+        $this->assertSame(str_repeat('é', 255), $record->ObjectTitle);
+        $this->assertSame(255, mb_strlen($record->ChangeType));
+        $this->assertSame(str_repeat('a', 255), $record->Agent);
+        $this->assertSame(str_repeat('1', 128), $record->RemoteIP);
+        $this->assertSame($record->ObjectTitle, DataChangeRecord::get()->byID($record->ID)->ObjectTitle);
+    }
+
     public function testObjectTitleNonStringCast()
     {
         $plain = PlainRecordable::create(['Title' => 42]);
@@ -470,6 +549,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
 
         $record = $this->lastRecord();
         $this->assertSame('42', $record->ObjectTitle);
+        $this->assertSame('42', DataChangeRecord::create()->track($plain, 'Publish')->ObjectTitle);
     }
 
     public function testObjectWithoutTitle()

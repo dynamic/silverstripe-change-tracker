@@ -306,6 +306,10 @@ class DataChangeRecord extends DataObject
         $this->Referer  = $_SERVER['HTTP_REFERER'] ?? '';
         $this->Agent    = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
+        foreach (['ChangeType', 'ObjectTitle', 'CurrentURL', 'Referer', 'RemoteIP', 'Agent'] as $field) {
+            $this->$field = $this->truncateToFieldSize($field, $this->$field);
+        }
+
         $this->write();
 
         if ($this->hasMethod('getAffectedPageRecords')) {
@@ -392,6 +396,24 @@ class DataChangeRecord extends DataObject
         if ($count > 0) {
             DB::alteration_message("Updated $count legacy $description in $table.$column", 'changed');
         }
+    }
+
+    /**
+     * Cut a value to the size of its column, counting characters, which is what the database did with longer values
+     * so far. Scalar values are stored as strings; null and other values are left alone.
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return mixed
+     */
+    private function truncateToFieldSize(string $field, $value)
+    {
+        if (!is_scalar($value) && !$value instanceof \Stringable) {
+            return $value;
+        }
+        $value = (string)$value;
+        $size = (int)$this->dbObject($field)->getSize();
+        return $size > 0 ? mb_substr($value, 0, $size, 'UTF-8') : $value;
     }
 
     /**

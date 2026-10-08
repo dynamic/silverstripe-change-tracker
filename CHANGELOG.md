@@ -54,3 +54,7 @@ Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names
   record write. The pages found and the rows written are unchanged.
 - **Live `LastEdited` update.** The value is passed as a query parameter instead of being formatted into the SQL.
   The same rows get the same values.
+- **Long values are cut before writing.** ChangeType, ObjectTitle, CurrentURL, Referer, Agent and RemoteIP are cut to
+  their column size by characters in `track()`, and a non-string ObjectTitle is stored as a string. The stored values
+  are the ones the database kept before; the record object now holds them too. Silverstripe 6 rejects over-long
+  values instead of cutting them, so this is needed for line `2`.
