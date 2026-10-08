@@ -15,7 +15,6 @@ use SilverStripe\Core\Config\Config;
  */
 class ChangeRecordable extends DataExtension
 {
-
     /**
      *
      * @var DataChangeTrackService
@@ -46,7 +45,8 @@ class ChangeRecordable extends DataExtension
                 $after[$field] = $change['after'];
             }
 
-            if (isset($before)
+            if (
+                isset($before)
                 && count($before) == 1
                 && count($after) == 1
                 && array_key_exists('Version', $before)

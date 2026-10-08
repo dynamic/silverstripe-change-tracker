@@ -16,7 +16,6 @@ use SilverStripe\Forms\GridField\GridField;
  */
 class SiteTreeChangeRecordable extends ChangeRecordable
 {
-
     public function onAfterPublish(&$original)
     {
         $this->dataChangeTrackService->track($this->owner, 'Publish');

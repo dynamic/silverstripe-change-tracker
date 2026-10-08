@@ -3,7 +3,6 @@
 namespace Dynamic\ChangeTracker\Job;
 
 use Dynamic\ChangeTracker\DataChangeRecord;
-
 use SilverStripe\Dev\BuildTask;
 
 /**
@@ -19,7 +18,7 @@ class DataChangeConvertJsonTask extends BuildTask
             foreach ($records as $record) {
                 $before = @unserialize($record->Before);
                 $after =  @unserialize($record->After);
-                
+
                 if ($before || $after) {
                     $record->Before = json_encode($before);
                     $record->After = json_encode($after);

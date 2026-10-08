@@ -130,7 +130,8 @@ class AffectedPagesService
 
             foreach ($hasOneRelations as $relation => $class) {
                 // Check if the current record is related to the SiteTree object
-                if ($class === get_class($changeRecord->ChangeRecord())
+                if (
+                    $class === get_class($changeRecord->ChangeRecord())
                     && $siteTree->$relation()->ID === $changeRecord->ChangeRecord()->ID
                 ) {
                     if (!array_key_exists($siteTree->ID, $affectedPages) && $siteTree->ID > 0) {

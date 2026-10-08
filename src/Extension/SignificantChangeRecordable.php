@@ -3,7 +3,6 @@
 namespace Dynamic\ChangeTracker\Extension;
 
 use DateTime;
-
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
@@ -19,7 +18,6 @@ use SilverStripe\Core\Config\Config;
  */
 class SignificantChangeRecordable extends DataExtension
 {
-
     private static $ignored_fields = [];
 
     private static $significant_fields = [];

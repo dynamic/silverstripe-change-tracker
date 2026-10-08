@@ -19,7 +19,6 @@ if (!class_exists(AbstractQueuedJob::class)) {
  */
 class PruneChangesBeforeJob extends AbstractQueuedJob
 {
-
     public function __construct($priorTo = null)
     {
         $ts = 0;
