@@ -81,3 +81,16 @@ warning, missed the "already linked" check, and an int id missed the extra data 
 - `TrackedManyManyListTest::testUntrackedJoinNoRecordButByIdQueryStillRuns` is now
   `testUntrackedJoinNoRecordAndNoByIdQuery`. `add()` checks whether the join table is tracked before it looks the item
   up, so an add to any other many_many relation runs the same queries as the stock list. Nothing recorded changes.
+
+## No pages from the lookup
+
+- New: `AffectedPagesTest::testNoAnswerFromTheLookupWritesNoJoinRows`. When the lookup returns null, `track()` passes
+  an empty list to `addMany()`. It used to pass null, which raised two "foreach() argument must be of type
+  array|object" warnings. No rows are written either way.
+
+## Referer fallback of the page URL column
+
+- `PageUrlColumnTest::testRefererFallback`: for a record without join rows and without a current URL, the column used
+  to read `$record->Referrer`, which is not a field, so the referer was never used. It now reads `Referer`, and a CMS
+  edit form URL there names the page. `track()` always sets the current URL, so only records written some other way
+  are affected. A further step shows a record without either URL still reads "No pages affected".

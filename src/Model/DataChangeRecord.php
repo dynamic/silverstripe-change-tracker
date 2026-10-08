@@ -313,7 +313,7 @@ class DataChangeRecord extends DataObject
         $this->write();
 
         if ($this->hasMethod('getAffectedPageRecords')) {
-            $this->AffectedPages()->addMany($this->getAffectedPageRecords());
+            $this->AffectedPages()->addMany($this->getAffectedPageRecords() ?? []);
         }
 
         return $this;

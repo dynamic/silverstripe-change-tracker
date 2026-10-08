@@ -2,8 +2,11 @@
 
 namespace Dynamic\ChangeTracker\Tests\Characterization;
 
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DB;
 use Dynamic\ChangeTracker\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\AffectedPagesService;
+use Dynamic\ChangeTracker\Tests\Fixtures\NoAnswerAffectedPagesService;
 use Dynamic\ChangeTracker\Tests\Fixtures\PlainRecordableSubclass;
 use Dynamic\ChangeTracker\Tests\Fixtures\ElementLike;
 use Dynamic\ChangeTracker\Tests\Fixtures\TrackedObject;
@@ -284,5 +287,18 @@ class AffectedPagesTest extends CharacterizationTestCase
         $this->assertSame('Publish', $record->ChangeType);
         $this->assertSame([(int)$page->ID], $this->joined($record));
         $this->assertInstanceOf(TrackedObject::class, $record->ChangeRecord());
+    }
+
+    public function testNoAnswerFromTheLookupWritesNoJoinRows()
+    {
+        Injector::inst()->registerService(new NoAnswerAffectedPagesService(), AffectedPagesService::class);
+        $plain = $this->makePlain('No answer');
+
+        $plain->Notes = 'changed';
+        $plain->write();
+
+        $this->assertSame('Change', $this->lastRecord()->ChangeType);
+        $this->assertSame([], $this->joined($this->lastRecord()));
+        $this->assertSame([], $this->describeWarnings($this->takeWarnings()));
     }
 }
