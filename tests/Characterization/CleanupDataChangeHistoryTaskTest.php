@@ -68,19 +68,50 @@ class CleanupDataChangeHistoryTaskTest extends CharacterizationTestCase
         );
     }
 
-    public function testImportOfTheRecordClassIsBroken()
+    public function testPrunesBelowTheNewestOldRecord()
     {
         $ids = $this->history();
 
-        // the task imports a class that does not exist, so it fails as soon as it looks for records
-        try {
-            TaskInvoker::run(CleanupDataChangeHistoryTask::create(), ['older' => '-3 months', 'run' => 1]);
-            $this->fail('The task found its record class');
-        } catch (\Error $e) {
-            $this->assertSame('Class "Dynamic\ChangeTracker\DataChangeRecord" not found', $e->getMessage());
-        }
+        $output = TaskInvoker::run(CleanupDataChangeHistoryTask::create(), ['older' => '-3 months', 'run' => 1]);
 
+        $this->assertMatchesRegularExpression(
+            '/^Pruning records older than \d{4}-\d\d-\d\d \d\d:\d\d:\d\d \(ID ' . $ids[1] . '\)<br\/>\n$/',
+            $output
+        );
+        // records older than the date are found, then every id below the newest of them is deleted
+        $this->assertSame([$ids[1], $ids[2], $ids[3]], $this->remaining($ids));
+    }
+
+    public function testDryRunWithoutRun()
+    {
+        $ids = $this->history();
+
+        $output = TaskInvoker::run(CleanupDataChangeHistoryTask::create(), ['older' => '-3 months']);
+
+        $this->assertStringEndsWith(
+            "Dry run performed, please supply the run=1 parameter to actually execute the deletion!<br/>\n",
+            $output
+        );
         $this->assertSame($ids, $this->remaining($ids));
         $this->assertSame(4, $this->joinRowsFor($ids));
+    }
+
+    public function testRecentDateNeedsForce()
+    {
+        $ids = $this->history();
+
+        $output = TaskInvoker::run(CleanupDataChangeHistoryTask::create(), ['older' => '-2 weeks', 'run' => 1]);
+
+        $this->assertStringStartsWith(
+            "To cleanup data more recent than 3 months, please supply the 'force' parameter as well as the run"
+            . " parameter, swapping to dry run <br/>\n",
+            $output
+        );
+        $this->assertStringContainsString('(ID ' . $ids[2] . ')', $output);
+        $this->assertStringEndsWith("Dry run performed, please supply the run=1 parameter to actually execute the deletion!<br/>\n", $output);
+        $this->assertSame($ids, $this->remaining($ids));
+
+        TaskInvoker::run(CleanupDataChangeHistoryTask::create(), ['older' => '-2 weeks', 'run' => 1, 'force' => 1]);
+        $this->assertSame([$ids[2], $ids[3]], $this->remaining($ids));
     }
 }

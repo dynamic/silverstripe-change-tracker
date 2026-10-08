@@ -2,7 +2,7 @@
 
 namespace Dynamic\ChangeTracker\Job;
 
-use Dynamic\ChangeTracker\DataChangeRecord;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\Queries\SQLDelete;
 

@@ -70,3 +70,6 @@ Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names
 - **Referer fallback of the Page URL column.** For a change record without AffectedPages rows and without a CurrentURL,
   the column now falls back to the Referer field, as intended. It read a misspelt `Referrer` property before, which is
   always empty. `track()` always sets CurrentURL, so records it writes are not affected.
+- **History cleanup task works.** `CleanupDataChangeHistoryTask` imported a class that does not exist and failed when
+  run with a valid date. It now prunes as its messages describe. Its URL is
+  `dev/tasks/Dynamic-ChangeTracker-Job-CleanupDataChangeHistoryTask`.
