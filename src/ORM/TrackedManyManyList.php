@@ -15,10 +15,12 @@ class TrackedManyManyList extends ManyManyList
 {
     public $trackedRelationships = [];
 
-    public function add($item, $extraFields = [])
+    #[\Override]
+    public function add(mixed $item, array $extraFields = []): void
     {
         if (!$this->isTrackedJoin()) {
-            return parent::add($item, $extraFields);
+            parent::add($item, $extraFields);
+            return;
         }
 
         // an id may come as an int or, from a form, as a numeric string
@@ -47,10 +49,10 @@ class TrackedManyManyList extends ManyManyList
             $this->recordManyManyChange(__FUNCTION__, $item);
         }
 
-        $result = parent::add($item, $extraFields);
-        return $result;
+        parent::add($item, $extraFields);
     }
 
+    #[\Override]
     public function remove($item)
     {
         $this->recordManyManyChange(__FUNCTION__, $item);
