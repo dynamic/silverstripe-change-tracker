@@ -128,15 +128,11 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $this->trackRelationships(['TrackedPage_Kids']);
         $page->Kids()->add($child);
 
-        // is_int() rejects form style numeric strings, which then read ->ID on a string. The lookup fails, so an
-        // item that is already linked is recorded again
+        // a form style numeric string is read as an id, so an item that is already linked is not recorded again
         $page->Kids()->add((string)$child->ID);
 
-        $this->assertSame(['Add "kid three" to Kids', 'Add "kid three" to Kids'], $this->mmTypes());
-        $this->assertSame(
-            ['TrackedManyManyList.php: Attempt to read property "ID" on string'],
-            $this->describeWarnings($this->takeWarnings())
-        );
+        $this->assertSame(['Add "kid three" to Kids'], $this->mmTypes());
+        $this->assertSame([], $this->describeWarnings($this->takeWarnings()));
         $this->assertCount(1, $page->Kids());
     }
 
@@ -177,21 +173,21 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $this->assertEquals(['Sort' => 2], $page->SortedKids()->getExtraData('SortedKids', $child->ID));
     }
 
-    public function testAddExistingByIdAlwaysRecords()
+    public function testAddExistingByIdComparesTheStoredExtraData()
     {
         $page = $this->makePage('Owner');
         $child = $this->makeChild('kid');
         $this->trackRelationships(['TrackedPage_SortedKids']);
         $page->SortedKids()->add($child, ['Sort' => 1]);
 
-        // With an id the extra data lookup reads ->ID on an int, finds nothing, and counts as a change
+        // with an id the stored extra data is looked up by that id: unchanged data records nothing
         $page->SortedKids()->add($child->ID, ['Sort' => 1]);
+        $this->assertSame(['Add "kid" to SortedKids'], $this->mmTypes());
 
+        // and changed data is recorded
+        $page->SortedKids()->add((string)$child->ID, ['Sort' => 2]);
         $this->assertSame(['Add "kid" to SortedKids', 'Add "kid" to SortedKids'], $this->mmTypes());
-        $this->assertSame(
-            ['TrackedManyManyList.php: Attempt to read property "ID" on int'],
-            $this->describeWarnings($this->takeWarnings())
-        );
+        $this->assertSame([], $this->describeWarnings($this->takeWarnings()));
     }
 
     public function testRemoveExactChangeType()
@@ -265,7 +261,7 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $this->assertSame([], $this->takeWarnings());
     }
 
-    public function testSetByIdListWithStringIdsWarns()
+    public function testSetByIdListWithStringIds()
     {
         $page = $this->makePage('Owner');
         $one = $this->makeChild('one');
@@ -276,10 +272,7 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $page->Kids()->setByIDList([(string)$one->ID, (string)$two->ID]);
 
         $this->assertSame(['Add "one" to Kids', 'Add "two" to Kids'], $this->mmTypes());
-        $this->assertSame(
-            array_fill(0, 2, 'TrackedManyManyList.php: Attempt to read property "ID" on string'),
-            $this->describeWarnings($this->takeWarnings())
-        );
+        $this->assertSame([], $this->describeWarnings($this->takeWarnings()));
     }
 
     public function testRemoveAllNotRecorded()

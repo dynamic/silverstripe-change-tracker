@@ -17,7 +17,12 @@ class TrackedManyManyList extends ManyManyList
 
     public function add($item, $extraFields = [])
     {
-        $id = is_int($item) ? $item : $item->ID;
+        // an id may come as an int or, from a form, as a numeric string
+        if (is_numeric($item)) {
+            $id = (int)$item;
+        } else {
+            $id = is_object($item) ? $item->ID : null;
+        }
 
         $existingItem = $this->byID($id);
         $shouldRecordChange = false;
@@ -25,7 +30,7 @@ class TrackedManyManyList extends ManyManyList
         if (!$existingItem) {
             $shouldRecordChange = true;
         } elseif (!empty($extraFields)) {
-            $currentExtraData = $this->getExtraData($this->getJoinTable(), $item->ID);
+            $currentExtraData = $this->getExtraData($this->getJoinTable(), $id);
             foreach ($extraFields as $field => $value) {
                 if (!array_key_exists($field, $currentExtraData) || $currentExtraData[$field] !== $value) {
                     $shouldRecordChange = true;

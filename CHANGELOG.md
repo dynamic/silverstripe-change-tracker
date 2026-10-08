@@ -58,3 +58,7 @@ Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names
   their column size by characters in `track()`, and a non-string ObjectTitle is stored as a string. The stored values
   are the ones the database kept before; the record object now holds them too. Silverstripe 6 rejects over-long
   values instead of cutting them, so this is needed for line `2`.
+- **Ids in many_many `add()`.** A numeric string id (as submitted by a CheckboxSetField or TagField) is treated as an
+  id: no "Attempt to read property ID" warning, and an item that is already linked is not recorded again. An id passed
+  with extra fields for an item that is already linked is now compared with the stored extra data, as a record object
+  was, so unchanged extra data no longer adds a row. This affects sites that track relations with extra fields.
