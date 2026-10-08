@@ -66,7 +66,7 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $this->assertSame('TrackedPage_Kids', $page->Kids()->getJoinTable());
     }
 
-    public function testUntrackedJoinNoRecordButByIdQueryStillRuns()
+    public function testUntrackedJoinNoRecordAndNoByIdQuery()
     {
         $page = $this->makePage('Owner');
         $warmUp = $this->makeChild('Warm up');
@@ -87,7 +87,7 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $tracked = $this->questions() - $before;
 
         $this->assertSame([], $this->mmTypes());
-        $this->assertSame(1, $tracked - $stock, 'Every add looks the item up before it checks the join is tracked');
+        $this->assertSame(0, $tracked - $stock, 'An add to a join that is not tracked runs no extra query');
     }
 
     public function testAddObjectExactChangeType()

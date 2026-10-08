@@ -17,6 +17,10 @@ class TrackedManyManyList extends ManyManyList
 
     public function add($item, $extraFields = [])
     {
+        if (!$this->isTrackedJoin()) {
+            return parent::add($item, $extraFields);
+        }
+
         // an id may come as an int or, from a form, as a numeric string
         if (is_numeric($item)) {
             $id = (int)$item;
@@ -54,10 +58,18 @@ class TrackedManyManyList extends ManyManyList
         return $result;
     }
 
+    /**
+     * Whether changes to this list's join table are recorded
+     */
+    protected function isTrackedJoin(): bool
+    {
+        return in_array($this->getJoinTable(), $this->trackedRelationships);
+    }
+
     protected function recordManyManyChange($type, $item)
     {
         $joinName = $this->getJoinTable();
-        if (!in_array($joinName, $this->trackedRelationships)) {
+        if (!$this->isTrackedJoin()) {
             return;
         }
         $parts = explode('_', $joinName);

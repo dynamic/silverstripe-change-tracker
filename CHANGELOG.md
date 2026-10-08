@@ -62,3 +62,6 @@ Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names
   id: no "Attempt to read property ID" warning, and an item that is already linked is not recorded again. An id passed
   with extra fields for an item that is already linked is now compared with the stored extra data, as a record object
   was, so unchanged extra data no longer adds a row. This affects sites that track relations with extra fields.
+- **No extra query for untracked joins.** Since the tracked list replaces every many_many list, `add()` now checks
+  that the join table is tracked before it looks the item up. Untracked relations run the same queries as the stock
+  list.

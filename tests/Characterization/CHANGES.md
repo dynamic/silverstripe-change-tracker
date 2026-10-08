@@ -75,3 +75,9 @@ warning, missed the "already linked" check, and an int id missed the extra data 
 - `TrackedManyManyListTest::testSetByIdListWithStringIdsWarns` is now `testSetByIdListWithStringIds`: the same rows are
   recorded, without the warnings.
 - No golden file changed.
+
+## No lookup for joins that are not tracked
+
+- `TrackedManyManyListTest::testUntrackedJoinNoRecordButByIdQueryStillRuns` is now
+  `testUntrackedJoinNoRecordAndNoByIdQuery`. `add()` checks whether the join table is tracked before it looks the item
+  up, so an add to any other many_many relation runs the same queries as the stock list. Nothing recorded changes.
