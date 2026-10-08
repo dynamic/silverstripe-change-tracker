@@ -102,3 +102,11 @@ warning, missed the "already linked" check, and an int id missed the extra data 
   It now imports `DataChangeRecord` and works as written: it finds the records older than the date and deletes every
   record with a lower id than the newest of them, as the pruning job does. `testDryRunWithoutRun` and
   `testRecentDateNeedsForce` pin the dry run and the three month guard.
+
+## Pruning removes the join rows of pruned records
+
+- `PruneChangesBeforeJobTest::testPruneLeavesTheJoinRowsOfDeletedRecords` is now
+  `testPruneRemovesTheJoinRowsOfDeletedRecords`: AffectedPages rows whose change record no longer exists are deleted
+  after the records. They were never shown anywhere.
+- `CleanupDataChangeHistoryTaskTest::testPrunesBelowTheNewestOldRecord` checks the same for the task, which also
+  prints how many join rows it removed.

@@ -75,11 +75,19 @@ class CleanupDataChangeHistoryTaskTest extends CharacterizationTestCase
         $output = TaskInvoker::run(CleanupDataChangeHistoryTask::create(), ['older' => '-3 months', 'run' => 1]);
 
         $this->assertMatchesRegularExpression(
-            '/^Pruning records older than \d{4}-\d\d-\d\d \d\d:\d\d:\d\d \(ID ' . $ids[1] . '\)<br\/>\n$/',
+            '/^Pruning records older than \d{4}-\d\d-\d\d \d\d:\d\d:\d\d \(ID ' . $ids[1] . '\)<br\/>\n'
+            . 'Removed \d+ affected page rows of pruned records<br\/>\n$/',
             $output
         );
         // records older than the date are found, then every id below the newest of them is deleted
         $this->assertSame([$ids[1], $ids[2], $ids[3]], $this->remaining($ids));
+        // and the join rows of the deleted records go with them
+        $this->assertSame(0, $this->joinRowsFor([$ids[0]]));
+        $this->assertSame(3, $this->joinRowsFor($ids));
+        $this->assertSame(0, (int)DB::query(
+            'SELECT COUNT(*) FROM "DataChangeRecord_AffectedPages" WHERE "DataChangeRecordID" NOT IN'
+            . ' (SELECT "ID" FROM "DataChangeRecord")'
+        )->value());
     }
 
     public function testDryRunWithoutRun()

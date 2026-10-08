@@ -16,6 +16,7 @@ use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Member;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Queries\SQLDelete;
 use SilverStripe\ORM\Queries\SQLUpdate;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionRoleCode;
@@ -396,6 +397,24 @@ class DataChangeRecord extends DataObject
         if ($count > 0) {
             DB::alteration_message("Updated $count legacy $description in $table.$column", 'changed');
         }
+    }
+
+    /**
+     * Delete AffectedPages join rows whose change record no longer exists, as left behind by pruning
+     *
+     * @return int number of rows deleted
+     */
+    public static function deleteOrphanAffectedPageRows(): int
+    {
+        $schema = DataObject::getSchema();
+        $component = $schema->manyManyComponent(DataChangeRecord::class, 'AffectedPages');
+        $table = $schema->tableName(DataChangeRecord::class);
+
+        SQLDelete::create('"' . $component['join'] . '"')
+            ->addWhere('"' . $component['parentField'] . '" NOT IN (SELECT "ID" FROM "' . $table . '")')
+            ->execute();
+
+        return DB::affected_rows();
     }
 
     /**

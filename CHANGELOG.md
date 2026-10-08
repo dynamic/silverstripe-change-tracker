@@ -73,3 +73,6 @@ Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names
 - **History cleanup task works.** `CleanupDataChangeHistoryTask` imported a class that does not exist and failed when
   run with a valid date. It now prunes as its messages describe. Its URL is
   `dev/tasks/Dynamic-ChangeTracker-Job-CleanupDataChangeHistoryTask`.
+- **Pruning removes orphan join rows.** `PruneChangesBeforeJob` and `CleanupDataChangeHistoryTask` delete the
+  AffectedPages rows of the change records they deleted (and any other row whose record no longer exists). Which
+  change records are pruned is unchanged: every record with a lower id than the newest record older than the date.

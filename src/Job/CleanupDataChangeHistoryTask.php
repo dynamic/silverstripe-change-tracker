@@ -45,6 +45,8 @@ class CleanupDataChangeHistoryTask extends BuildTask
         if ($confirm && $max) {
             $query = new SQLDelete('DataChangeRecord', '"ID" < \'' . $max . '\'');
             $query->execute();
+            $orphans = DataChangeRecord::deleteOrphanAffectedPageRows();
+            echo "Removed $orphans affected page rows of pruned records<br/>\n";
         } else {
             echo "Dry run performed, please supply the run=1 parameter to actually execute the deletion!<br/>\n";
         }

@@ -85,13 +85,13 @@ class PruneChangesBeforeJobTest extends CharacterizationTestCase
         $this->assertSame(date('Y-m-d 03:00:00', strtotime('tomorrow')), $next->StartAfter);
     }
 
-    public function testPruneLeavesTheJoinRowsOfDeletedRecords()
+    public function testPruneRemovesTheJoinRowsOfDeletedRecords()
     {
         $this->history();
 
         (new PruneChangesBeforeJob('-3 months'))->process();
 
-        $this->assertSame(1, $this->orphanJoinRows());
-        $this->assertSame(4, $this->joinRows());
+        $this->assertSame(0, $this->orphanJoinRows());
+        $this->assertSame(3, $this->joinRows());
     }
 }
