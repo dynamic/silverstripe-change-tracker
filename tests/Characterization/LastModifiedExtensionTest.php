@@ -2,6 +2,7 @@
 
 namespace Dynamic\ChangeTracker\Tests\Characterization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionMethod;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\DataObject;
@@ -81,7 +82,7 @@ class LastModifiedExtensionTest extends CharacterizationTestCase
     /**
      * @return array[] scenario name => [page LastEdited, owned LastEdited or null]
      */
-    public function scenarioProvider(): array
+    public static function scenarioProvider(): array
     {
         return [
             'no owned record' => ['2030-01-02 03:04:05', null],
@@ -94,6 +95,7 @@ class LastModifiedExtensionTest extends CharacterizationTestCase
     /**
      * @dataProvider scenarioProvider
      */
+    #[DataProvider('scenarioProvider')]
     public function testEffectiveLastEditedMatchesTheSitesCode(string $pageEdited, ?string $featureEdited)
     {
         [$legacy, $module] = $this->pair($pageEdited, $featureEdited);
@@ -106,6 +108,7 @@ class LastModifiedExtensionTest extends CharacterizationTestCase
     /**
      * @dataProvider scenarioProvider
      */
+    #[DataProvider('scenarioProvider')]
     public function testMetaComponentsMatchTheSitesCode(string $pageEdited, ?string $featureEdited)
     {
         $this->logOut();
