@@ -1,0 +1,173 @@
+[
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": {
+            "ClassName": "TrackedPage",
+            "ID": "#id",
+            "Subtitle": "first",
+            "Title": "Lifecycle page",
+            "URLSegment": "lifecycle-page"
+        },
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": {
+            "ClassName": "TrackedPage",
+            "ID": 0,
+            "Subtitle": null,
+            "Title": null,
+            "URLSegment": null
+        },
+        "ChangeType": "New",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": {
+            "Title": "Lifecycle page, renamed"
+        },
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": {
+            "Title": "Lifecycle page"
+        },
+        "ChangeType": "Change",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": {
+            "ClassName": "TrackedPage",
+            "FeatureID": 0,
+            "ID": "#id",
+            "RecordClassName": "TrackedPage",
+            "Subtitle": "first",
+            "Title": "Lifecycle page, renamed",
+            "URLSegment": "lifecycle-page"
+        },
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Publish",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": {
+            "Subtitle": "second"
+        },
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": {
+            "Subtitle": "first"
+        },
+        "ChangeType": "Change",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Publish Live to Stage",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Publish 1 to Stage",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Delete from Live",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Live",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": {
+            "ClassName": "TrackedPage",
+            "ID": "#id",
+            "RecordClassName": "TrackedPage",
+            "Subtitle": "second",
+            "Title": "Lifecycle page, renamed",
+            "URLSegment": "lifecycle-page"
+        },
+        "ChangeType": "Unpublish",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Lifecycle page, renamed",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    }
+]
