@@ -2,6 +2,7 @@
 
 namespace Dynamic\ChangeTracker\Tests\Characterization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
@@ -412,7 +413,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
     /**
      * @return array[] field name => [field name], so the data provider only returns strings
      */
-    public function longValueProvider(): array
+    public static function longValueProvider(): array
     {
         return [
             'ObjectTitle' => ['ObjectTitle', 255],
@@ -429,6 +430,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
      *
      * @dataProvider longValueProvider
      */
+    #[DataProvider('longValueProvider')]
     public function testLongValuesTruncated(string $field, int $limit)
     {
         $long = str_repeat('x', 400);
@@ -469,6 +471,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
      *
      * @dataProvider longValueProvider
      */
+    #[DataProvider('longValueProvider')]
     public function testLongMultibyteValuesMatchDatabaseTruncation(string $field, int $limit)
     {
         $long = str_repeat('é€', 150) . str_repeat('x', 100);
