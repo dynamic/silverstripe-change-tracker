@@ -19,6 +19,19 @@ if (!class_exists(AbstractQueuedJob::class)) {
  */
 class PruneChangesBeforeJob extends AbstractQueuedJob
 {
+    /**
+     * Declared so that PHP 8.2 and later do not treat them as dynamic properties. They stay public, as they were
+     * before, because a queued job is stored serialised with its property names.
+     *
+     * @var string|null
+     */
+    public $priorTo = null;
+
+    /**
+     * @var string|null
+     */
+    public $pruneBefore = null;
+
     public function __construct($priorTo = null)
     {
         $ts = 0;

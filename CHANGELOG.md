@@ -45,6 +45,11 @@ with the Dynamic fork of it (`dynamic/silverstripe-datachange-tracker`, branch `
   to JSON. It imported a class that does not exist and failed whenever it was run.
 - `SignificantChangeRecordable`, which no site using this module applied. A site that applies it should keep a copy.
 
+### Fixed
+
+- `PruneChangesBeforeJob` declares the `priorTo` and `pruneBefore` properties it sets, which PHP 8.2 reports as dynamic
+  properties. They stay public, so queued jobs stored before the change still load.
+
 ### Intentional behaviour changes vs fork 7aa2fd7
 
 Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names the assertions that changed.
