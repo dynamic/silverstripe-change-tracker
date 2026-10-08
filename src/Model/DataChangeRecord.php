@@ -136,7 +136,7 @@ class DataChangeRecord extends DataObject
                     $prop = json_encode($prop);
                 }
 
-                if((is_object($decodedBefore) && !array_key_exists($field, get_object_vars($decodedBefore))) || (is_object($decodedAfter) && !array_key_exists($field, get_object_vars($decodedAfter)))) {
+                if ((is_object($decodedBefore) && !array_key_exists($field, get_object_vars($decodedBefore))) || (is_object($decodedAfter) && !array_key_exists($field, get_object_vars($decodedAfter)))) {
                     continue;
                 }
 
@@ -163,10 +163,12 @@ class DataChangeRecord extends DataObject
         foreach ($fields->dataFields() as $field) {
             $value = $field->Value();
             if ($value && is_object($value)) {
-                if ((method_exists($value, 'hasMethod') && !$value->hasMethod('forTemplate')) || !method_exists(
-                    $value,
-                    'forTemplate'
-                )) {
+                if (
+                    (method_exists($value, 'hasMethod') && !$value->hasMethod('forTemplate')) || !method_exists(
+                        $value,
+                        'forTemplate'
+                    )
+                ) {
                     $field->setValue('[Missing ' . $value::class . '::forTemplate]');
                 }
             }

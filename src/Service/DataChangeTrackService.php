@@ -3,7 +3,6 @@
 namespace Dynamic\ChangeTracker\Service;
 
 use Dynamic\ChangeTracker\Model\DataChangeRecord;
-
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -11,7 +10,6 @@ use SilverStripe\ORM\DataObject;
  */
 class DataChangeTrackService implements \Stringable
 {
-
     protected $dcr_cache = [];
 
     public $disabled = false;
@@ -28,7 +26,7 @@ class DataChangeTrackService implements \Stringable
         }
 
         $changeRecord = $this->dcr_cache["{$object->ID}-{$object->Classname}"]->track($object, $type);
-        
+
         return $changeRecord;
     }
 
