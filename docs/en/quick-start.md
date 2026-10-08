@@ -78,26 +78,6 @@ Dynamic\ChangeTracker\Model\DataChangeRecord:
 
 ```
 
-## Significant Change tracking
-
-Sometimes reporting changes to certain fields to CMS users is desirable (e.g seeing the last time a field was updated).
-This is handled by `SignificantChangeRecordable`, which looks for a list of `significant_fields`.
-
-Example:
-
-```
-TeamMember:
-  significant_fields:
-    - 'Name'
-    - 'Address'
-    - 'OfficeNumber'
-    - 'Position'
-    - 'Mobile'
-  extensions:
-    - 'Dynamic\ChangeTracker\Extension\ChangeRecordable'
-    - 'Dynamic\ChangeTracker\Extension\SignificantChangeRecordable'
-```
-
 ## Pruning old data
 
 Over time, the data recorded will become overwhelming in size. May not be a problem for you, but if it is

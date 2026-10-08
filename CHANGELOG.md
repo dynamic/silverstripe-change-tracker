@@ -43,6 +43,7 @@ with the Dynamic fork of it (`dynamic/silverstripe-datachange-tracker`, branch `
 
 - `DataChangeConvertJsonTask`, which converted records stored by the Silverstripe 3 versions from PHP serialisation
   to JSON. It imported a class that does not exist and failed whenever it was run.
+- `SignificantChangeRecordable`, which no site using this module applied. A site that applies it should keep a copy.
 
 ### Intentional behaviour changes vs fork 7aa2fd7
 
