@@ -94,3 +94,19 @@ warning, missed the "already linked" check, and an int id missed the extra data 
   to read `$record->Referrer`, which is not a field, so the referer was never used. It now reads `Referer`, and a CMS
   edit form URL there names the page. `track()` always sets the current URL, so only records written some other way
   are affected. A further step shows a record without either URL still reads "No pages affected".
+
+## History cleanup task runs again
+
+- `CleanupDataChangeHistoryTaskTest::testImportOfTheRecordClassIsBroken` is now `testPrunesBelowTheNewestOldRecord`.
+  The task imported a class that does not exist and failed with "Class not found" as soon as it looked for records.
+  It now imports `DataChangeRecord` and works as written: it finds the records older than the date and deletes every
+  record with a lower id than the newest of them, as the pruning job does. `testDryRunWithoutRun` and
+  `testRecentDateNeedsForce` pin the dry run and the three month guard.
+
+## Pruning removes the join rows of pruned records
+
+- `PruneChangesBeforeJobTest::testPruneLeavesTheJoinRowsOfDeletedRecords` is now
+  `testPruneRemovesTheJoinRowsOfDeletedRecords`: AffectedPages rows whose change record no longer exists are deleted
+  after the records. They were never shown anywhere.
+- `CleanupDataChangeHistoryTaskTest::testPrunesBelowTheNewestOldRecord` checks the same for the task, which also
+  prints how many join rows it removed.

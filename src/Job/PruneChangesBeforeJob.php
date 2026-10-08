@@ -57,6 +57,7 @@ class PruneChangesBeforeJob extends AbstractQueuedJob
 
         $query = new SQLDelete('DataChangeRecord', '"ID" < \'' . $max . '\'');
         $query->execute();
+        DataChangeRecord::deleteOrphanAffectedPageRows();
 
         $job = new PruneChangesBeforeJob($this->priorTo);
 
