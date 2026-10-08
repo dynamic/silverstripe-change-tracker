@@ -115,9 +115,10 @@ class DataChangeAdminTest extends CharacterizationTestCase
     {
         $admin = DataChangeAdmin::singleton();
 
-        // The code is derived from the class name, so renaming the class renames the permission
-        $this->assertSame('CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin', $admin->getRequiredPermissions());
-        $this->assertArrayHasKey(
+        // The code is fixed in configuration instead of derived from the class name
+        $this->assertSame('CMS_ACCESS_DataChangeAdmin', $admin->getRequiredPermissions());
+        $this->assertArrayHasKey('CMS_ACCESS_DataChangeAdmin', $admin->providePermissions());
+        $this->assertArrayNotHasKey(
             'CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin',
             $admin->providePermissions()
         );
@@ -150,8 +151,8 @@ class DataChangeAdminTest extends CharacterizationTestCase
         $this->assertSame(302, $response->getStatusCode());
         $this->assertStringEndsWith('/admin/pages', $response->getHeader('Location'));
 
-        // the literal code that SiteTreeChangeRecordable checks for the page tab is not the code the admin requires
-        $this->logInWithPermission('CMS_ACCESS_DataChangeAdmin');
+        // a code derived from the class name grants nothing
+        $this->logInWithPermission('CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin');
         $this->assertSame(403, $this->get('admin/datachanges')->getStatusCode());
     }
 
@@ -159,7 +160,7 @@ class DataChangeAdminTest extends CharacterizationTestCase
     {
         $this->changeRecord();
 
-        $this->logInWithPermission('CMS_ACCESS_Dynamic\ChangeTracker\Admin\DataChangeAdmin');
+        $this->logInWithPermission('CMS_ACCESS_DataChangeAdmin');
         $this->assertSame(200, $this->get('admin/datachanges')->getStatusCode());
 
         // any CMS user with access to every section can open it

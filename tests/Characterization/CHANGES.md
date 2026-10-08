@@ -30,3 +30,18 @@ The verbatim site extension stays in `Fixtures` as the reference for `AffectedPa
   `track()` used to run the lookup separately, one after the other on the same record; the result is now kept on the
   record object until it is written again. The pages found and the rows written are the same. The counter moved from
   a subclass of the site extension to a subclass of `AffectedPagesService`.
+
+## Rename to Dynamic\ChangeTracker
+
+Test files changed by namespace only. The strings derived from class names changed with them: the admin's record
+path (`Dynamic-ChangeTracker-Model-DataChangeRecord`), the join table of the upstream underscore fixtures and, until the
+next change, the permission code derived from the admin class. No golden file changed.
+
+## Fixed permission code for the Data Changes admin
+
+- `DataChangeAdminTest::testRequiredPermissionCode`: the admin requires `CMS_ACCESS_DataChangeAdmin`, set in
+  configuration, instead of a code derived from its class name. Groups and roles holding the code of the old package
+  are migrated by the build (`LegacyMigrationTest`).
+- `DataChangeAdminTest::testNoPermission403`: the last step used to show that `CMS_ACCESS_DataChangeAdmin` did not
+  open the admin. It now shows that a code derived from the class name does not.
+- `DataChangeAdminTest::testPermissionHolders`: `CMS_ACCESS_DataChangeAdmin` now opens the admin.
