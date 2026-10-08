@@ -2,10 +2,9 @@
 
 namespace Symbiote\DataChange\Model;
 
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Versioned\Versioned;
+use Symbiote\DataChange\Service\LiveLastEditedPropagator;
 
 /**
  * A replacement manymany list that tracks add and remove calls
@@ -85,16 +84,7 @@ class TrackedManyManyList extends ManyManyList
             $changeRecord = singleton('DataChangeTrackService')->track($onItem, $type);
 
             if ($changeRecord && $changeRecord->hasMethod('AffectedPages')) {
-                foreach ($changeRecord->AffectedPages() as $page) {
-                    if ($page && $page->isPublished() && $item->hasExtension(Versioned::class) && $item->isPublished()) {
-                        // Update the LastEdited value for the SiteTree_Live record directly via SQL
-                        DB::query(sprintf(
-                            "UPDATE \"SiteTree_Live\" SET \"LastEdited\" = '%s' WHERE \"ID\" = %d",
-                            $changeRecord->Created,
-                            $page->ID
-                        ));
-                    }
-                }
+                LiveLastEditedPropagator::singleton()->onManyManyChange($changeRecord, $item);
             }
         }
     }
