@@ -13,8 +13,6 @@
     <testsuites>
         <testsuite name="Default">
             <directory>tests</directory>
-            <!-- Fails on the current code because a write without a logged in member reads a property of null -->
-            <exclude>tests/DataChangeCMSTest.php</exclude>
         </testsuite>
     </testsuites>
     <coverage>
