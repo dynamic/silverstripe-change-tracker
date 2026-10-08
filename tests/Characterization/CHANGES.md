@@ -54,3 +54,11 @@ next change, the permission code derived from the admin class. No golden file ch
   Now that the admin requires that code, the tab checks `published_state_permission`, `CMS_ACCESS_LeftAndMain` by
   default, so the people who see the tab stay the same. Someone holding only the admin's code sees the admin but not
   the tab, as before. `testTabPermissionIsConfigurable` covers the setting.
+
+## Values cut to the column size before writing
+
+- `DataChangeRecordTrackTest::testLongValuesTruncated` and `testLongMultibyteValuesMatchDatabaseTruncation` are
+  unchanged and still pass: `track()` now cuts ChangeType, ObjectTitle, CurrentURL, Referer, Agent and RemoteIP to
+  their column size by characters, which keeps exactly what the database kept when it cut them.
+- New: `testTrackCutsValuesBeforeWriting` shows the record object holds the cut values, and
+  `testObjectTitleNonStringCast` now also checks the in-memory title is the string `'42'`.

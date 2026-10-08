@@ -525,6 +525,23 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
         $this->assertSame([], $this->takeWarnings());
     }
 
+    public function testTrackCutsValuesBeforeWriting()
+    {
+        $plain = $this->makePlain(str_repeat('é', 300));
+        $_SERVER['HTTP_USER_AGENT'] = str_repeat('a', 300);
+        $_SERVER['REMOTE_ADDR'] = str_repeat('1', 300);
+
+        $plain->Notes = 'changed';
+        $record = DataChangeRecord::create()->track($plain, 'Change ' . str_repeat('c', 300));
+
+        // the record object holds the stored values, not the longer ones it was given
+        $this->assertSame(str_repeat('é', 255), $record->ObjectTitle);
+        $this->assertSame(255, mb_strlen($record->ChangeType));
+        $this->assertSame(str_repeat('a', 255), $record->Agent);
+        $this->assertSame(str_repeat('1', 128), $record->RemoteIP);
+        $this->assertSame($record->ObjectTitle, DataChangeRecord::get()->byID($record->ID)->ObjectTitle);
+    }
+
     public function testObjectTitleNonStringCast()
     {
         $plain = PlainRecordable::create(['Title' => 42]);
@@ -532,6 +549,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
 
         $record = $this->lastRecord();
         $this->assertSame('42', $record->ObjectTitle);
+        $this->assertSame('42', DataChangeRecord::create()->track($plain, 'Publish')->ObjectTitle);
     }
 
     public function testObjectWithoutTitle()
