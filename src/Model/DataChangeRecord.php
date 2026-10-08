@@ -15,6 +15,13 @@ use SilverStripe\Versioned\DataDifferencer;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Member;
 use SilverStripe\Control\Director;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Queries\SQLUpdate;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionRoleCode;
+use Dynamic\ChangeTracker\Admin\DataChangeAdmin;
+use Dynamic\ChangeTracker\Job\PruneChangesBeforeJob;
+use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 
 /**
  * Record a change to a dataobject; use this to track data changes of objects
@@ -24,6 +31,21 @@ use SilverStripe\Control\Director;
  */
 class DataChangeRecord extends DataObject
 {
+    /**
+     * Class name of this model in symbiote/silverstripe-datachange-tracker and the Dynamic fork of it
+     */
+    public const LEGACY_CLASS = 'Symbiote\\DataChange\\Model\\DataChangeRecord';
+
+    /**
+     * Permission code the Data Changes admin required in those packages, derived from its class name
+     */
+    public const LEGACY_PERMISSION_CODE = 'CMS_ACCESS_Symbiote\\DataChange\\Admin\\DataChangeAdmin';
+
+    /**
+     * Class name of the pruning job in those packages, as stored in queued job descriptors
+     */
+    public const LEGACY_PRUNE_JOB_CLASS = 'Symbiote\\DataChange\\Job\\PruneChangesBeforeJob';
+
     private static $table_name = 'DataChangeRecord';
     private static $db = [
         'ChangeType' => 'Varchar',
@@ -291,6 +313,85 @@ class DataChangeRecord extends DataObject
         }
 
         return $this;
+    }
+
+    /**
+     * Bring data written by symbiote/silverstripe-datachange-tracker, or the Dynamic fork of it, in line with this
+     * module. Each statement is limited to one table and only touches rows that still hold a legacy value, so running
+     * the build again changes nothing.
+     *
+     * - ClassName of change records: rows that still name the legacy class, or that were written with an empty value
+     *   while the old and new code were swapped, get the class of this model. The ClassName remapping in
+     *   _config/legacy.yml covers the first case during the build; this repeats it for rows written afterwards.
+     * - Permission and PermissionRoleCode: the legacy admin access code becomes the code DataChangeAdmin requires.
+     * - QueuedJobDescriptor, when the queued jobs module is installed: pending pruning jobs get the new class name.
+     */
+    public function requireDefaultRecords()
+    {
+        parent::requireDefaultRecords();
+
+        $schema = DataObject::getSchema();
+
+        $this->migrateLegacyValue(
+            $schema->tableName(DataChangeRecord::class),
+            'ClassName',
+            ['', self::LEGACY_CLASS],
+            DataChangeRecord::class,
+            'change records'
+        );
+
+        $code = DataChangeAdmin::config()->get('required_permission_codes');
+        if (is_string($code) && $code !== self::LEGACY_PERMISSION_CODE) {
+            foreach ([Permission::class, PermissionRoleCode::class] as $class) {
+                $this->migrateLegacyValue(
+                    $schema->tableName($class),
+                    'Code',
+                    [self::LEGACY_PERMISSION_CODE],
+                    $code,
+                    'permission codes'
+                );
+            }
+            // drop permissions cached in this process before the codes changed
+            Permission::reset();
+        }
+
+        if (class_exists(QueuedJobDescriptor::class)) {
+            $table = $schema->tableName(QueuedJobDescriptor::class);
+            if (DB::get_schema()->hasTable($table)) {
+                $this->migrateLegacyValue(
+                    $table,
+                    'Implementation',
+                    [self::LEGACY_PRUNE_JOB_CLASS],
+                    PruneChangesBeforeJob::class,
+                    'queued pruning jobs'
+                );
+            }
+        }
+    }
+
+    /**
+     * @param string $table
+     * @param string $column
+     * @param string[] $legacyValues
+     * @param string $value
+     * @param string $description for the build output
+     */
+    private function migrateLegacyValue(
+        string $table,
+        string $column,
+        array $legacyValues,
+        string $value,
+        string $description
+    ): void {
+        $placeholders = implode(', ', array_fill(0, count($legacyValues), '?'));
+        SQLUpdate::create('"' . $table . '"', ['"' . $column . '"' => $value])
+            ->addWhere(['"' . $column . '" IN (' . $placeholders . ')' => $legacyValues])
+            ->execute();
+
+        $count = DB::affected_rows();
+        if ($count > 0) {
+            DB::alteration_message("Updated $count legacy $description in $table.$column", 'changed');
+        }
     }
 
     /**
