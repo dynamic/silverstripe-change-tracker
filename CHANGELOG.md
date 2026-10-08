@@ -39,6 +39,11 @@ with the Dynamic fork of it (`dynamic/silverstripe-datachange-tracker`, branch `
 - `DataChangeRecord.field_blacklist` contains `SearchContent` by default, as every site configured.
 - The Data Changes admin requires the fixed code `CMS_ACCESS_DataChangeAdmin`.
 
+### Removed
+
+- `DataChangeConvertJsonTask`, which converted records stored by the Silverstripe 3 versions from PHP serialisation
+  to JSON. It imported a class that does not exist and failed whenever it was run.
+
 ### Intentional behaviour changes vs fork 7aa2fd7
 
 Each change below is pinned by a test; `tests/Characterization/CHANGES.md` names the assertions that changed.
