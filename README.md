@@ -214,6 +214,10 @@ vendor/bin/phpunit
 With the harness used for the 1.x line, `./run.sh` runs the same suite in a DDEV project, and `./gha-mode.sh` mirrors
 the `silverstripe/gha-ci` job. Run `FLUSH=1` after adding or removing test files so the manifest is rebuilt.
 
+The CI workflow calls `silverstripe/gha-ci` `@v1`, which builds its job matrix from `composer.json` and the branch name.
+It does not pin Silverstripe 6.0 or 6.3 by itself: the `--prefer-lowest` job and the PHP versions of the CMS 6 line come
+from the generator. The 6.0 lowest, latest 6.x and 6.3 release candidate runs are local harness variants.
+
 `tests/Characterization/` pins what the module does now, including the behaviour that is known to be wrong. A change
 that alters an observable result must change its assertion in the same commit and be listed in
 `tests/Characterization/CHANGES.md`. `tests/Characterization/golden/` holds the recorded outputs for the golden
