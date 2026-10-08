@@ -70,7 +70,13 @@ class DataChangeRecord extends DataObject
      * @var boolean
      */
     private static $save_request_vars      = false;
-    private static $field_blacklist        = ['Password'];
+    /**
+     * Fields never stored in the before and after values of a change. SearchContent is the full text search index
+     * that every site using this module excluded in its own configuration.
+     *
+     * @var string[]
+     */
+    private static $field_blacklist        = ['Password', 'SearchContent'];
     private static $request_vars_blacklist = ['url', 'SecurityID'];
 
     public function getCMSFields($params = null)

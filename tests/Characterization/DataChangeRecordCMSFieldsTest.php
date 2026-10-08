@@ -12,7 +12,6 @@ use TypeError;
 use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
 use Symbiote\DataChange\Model\DataChangeRecord;
 use Symbiote\DataChange\Tests\Fixtures\CmsFieldsProbeExtension;
-use Symbiote\DataChange\Tests\Fixtures\LegacySiteDataChangeRecordExtension;
 use Symbiote\DataChange\Tests\Fixtures\ObjectValueReadonlyField;
 use Symbiote\DataChange\Tests\Fixtures\TrackedObject;
 use Symbiote\DataChange\Tests\TestTextJSONFieldObject;
@@ -27,7 +26,6 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
             SiteTreeChangeRecordable::class,
         ],
         DataChangeRecord::class => [
-            LegacySiteDataChangeRecordExtension::class,
             CmsFieldsProbeExtension::class,
         ],
     ];

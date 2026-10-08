@@ -14,7 +14,6 @@ use Symbiote\DataChange\Extension\SiteTreeChangeRecordable;
 use Symbiote\DataChange\Model\DataChangeRecord;
 use Symbiote\DataChange\Model\TrackedManyManyList;
 use Symbiote\DataChange\Tests\Fixtures\ElementLike;
-use Symbiote\DataChange\Tests\Fixtures\LegacySiteDataChangeRecordExtension;
 use Symbiote\DataChange\Tests\Fixtures\PlainRecordable;
 use Symbiote\DataChange\Tests\Fixtures\PlainRecordableSubclass;
 use Symbiote\DataChange\Tests\Fixtures\ThroughJoin;
@@ -61,9 +60,6 @@ abstract class CharacterizationTestCase extends FunctionalTest
     protected static $required_extensions = [
         SiteTree::class => [
             SiteTreeChangeRecordable::class,
-        ],
-        DataChangeRecord::class => [
-            LegacySiteDataChangeRecordExtension::class,
         ],
     ];
 

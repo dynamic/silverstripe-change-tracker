@@ -53,7 +53,7 @@ class TrackedManyManyListTest extends CharacterizationTestCase
     public function testSwapAppliesToAllManyMany()
     {
         $page = $this->makePage('Owner');
-        $this->assertSame(ManyManyList::class, get_class($page->Kids()), 'The module does not install the swap itself');
+        $this->assertSame(TrackedManyManyList::class, get_class($page->Kids()), 'The module installs the swap itself');
 
         $this->trackRelationships(['TrackedPage_Kids']);
 
@@ -73,6 +73,7 @@ class TrackedManyManyListTest extends CharacterizationTestCase
         $first = $this->makeChild('First');
         $second = $this->makeChild('Second');
 
+        Injector::inst()->load([ManyManyList::class => ['class' => ManyManyList::class]]);
         $page->Kids()->add($warmUp);
         $before = $this->questions();
         $page->Kids()->add($first);
