@@ -322,7 +322,10 @@ AE has no last-modified code. AP's `Seo/PageSeoExtension.php` and `Extension/Blo
 ## Step 5: build and verify
 
 1. Commit the changes (see "Rules for commits" below). Commit before the build.
-2. Run `ddev sake dev/build flush=1` (SS5 uses `sake`, no `vendor/bin/sake`).
+2. Run the build twice: `ddev sake dev/build flush=1`, then the same command again. `DataChangeRecord.ClassName` is an
+   enum column. The first build adds the new class name to it and then rewrites the rows; the old class name stays
+   allowed in that build, because rows still held it when the table was checked. The second build removes the old
+   name from the column. Compare the schema and run the checks below after the second build.
 3. Run the verification SQL below, and compare with the baseline.
 4. Open Data Changes, a single change record, the Published States tab on one page, and `listpages` and `listdocs`
    as an administrator and as an editor. The Data Changes menu item, and records for a publish and a many_many change.
@@ -356,10 +359,11 @@ SELECT Implementation, COUNT(*) FROM QueuedJobDescriptor WHERE Implementation LI
 SELECT COUNT(*), SUM(UNIX_TIMESTAMP(LastEdited)) FROM SiteTree_Live;
 ```
 
-Expected after the build: the `ClassName` query returns one row, `Dynamic\ChangeTracker\Model\DataChangeRecord`; the
-orphan queries return 0; the permission queries return only `CMS_ACCESS_DataChangeAdmin`; the job query returns only
-`Dynamic\ChangeTracker\Job\PruneChangesBeforeJob`. The live checksum must equal the baseline (the build does not change
-`SiteTree_Live`). The change-record counts must equal the baseline plus the rows written by the site in between.
+Expected after the second build: the `ClassName` query returns one row,
+`Dynamic\ChangeTracker\Model\DataChangeRecord`; the orphan queries return 0; the permission queries return only
+`CMS_ACCESS_DataChangeAdmin`; the job query returns only `Dynamic\ChangeTracker\Job\PruneChangesBeforeJob`. The live
+checksum must equal the baseline (the build does not change `SiteTree_Live`). The change-record counts must equal the
+baseline plus the rows written by the site in between.
 
 Also confirm that `grep -rnE 'Symbiote.DataChange' app/_config app/src` lists nothing (the site's tests keep the old
 names, see Step 4), and that `SELECT ... WHERE Code LIKE 'CMS_ACCESS_Symbiote%'` returns 0 rows.
@@ -370,8 +374,12 @@ Keep the baseline DB snapshot and the commit before the swap.
 
 1. Revert the commit. Run `ddev composer update symbiote/silverstripe-datachange-tracker --with-dependencies` after
    restoring the old `composer.json`, and check the lock diff.
-2. Reverse the data migration, after the build on the old code. Run it only if `CMS_ACCESS_DataChangeAdmin` was not
-   already granted before the swap (the pre-check above):
+2. Run one build on the old code, `ddev sake dev/build flush=1`, before the reverse update. `ClassName` is an enum
+   column: after the second build of the new code it allows only `Dynamic\ChangeTracker\Model\DataChangeRecord`, so
+   the reverse update fails with `Data truncated for column 'ClassName'`. The old code's build adds the old class name
+   to the column and keeps the stored values, because a value that rows still hold stays allowed.
+3. Reverse the data migration. Run the permission updates only if `CMS_ACCESS_DataChangeAdmin` was not already granted
+   before the swap (the pre-check above):
 
    ```sql
    UPDATE DataChangeRecord SET ClassName = 'Symbiote\\DataChange\\Model\\DataChangeRecord'
@@ -384,7 +392,9 @@ Keep the baseline DB snapshot and the commit before the swap.
        WHERE Implementation = 'Dynamic\\ChangeTracker\\Job\\PruneChangesBeforeJob';
    ```
 
-3. If the reverse update does not give the baseline counts, restore the database snapshot instead. Rows written after
+4. Run the build again, which removes the new class name from the column. The `ClassName` query of the verification
+   SQL then lists only `Symbiote\DataChange\Model\DataChangeRecord`.
+5. If the reverse update does not give the baseline counts, restore the database snapshot instead. Rows written after
    the snapshot are lost in that case, unless they are re-inserted from the dump of the live database first.
 
 Rehearse the rollback on a local copy before the production change.
@@ -409,6 +419,8 @@ in the Injector block as shown.
 - Tests and regression suite: `app/tests` and the suite's baselines keep the fork's permission code and class names,
   unedited. The swap's differences (Step 4) are registered as known differences of the module stage, and the run at
   that stage observes each of them.
+- The build was run twice after the swap, and the rollback was rehearsed with the extra build on the old code (Step 5
+  and "Rollback").
 
 ### AE
 
@@ -455,4 +467,5 @@ Line `2` is not cut yet. These notes apply once it is released.
 5. **PasswordValidator.** The class is removed on SS6 and is fatal if configured. Use `RulesPasswordValidator` with the
    same rules (length, digits, letters) as the site's current validator.
 6. **TinyMCE 6** and the rest of the SS6 config changes follow the SS6 upgrade for the site.
-7. Run the verification SQL again after `dev/build flush=1`.
+7. Run the build twice, as in Step 5 (`vendor/bin/sake db:build --flush` on Silverstripe 6), and run the verification
+   SQL again after the second build.

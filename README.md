@@ -56,10 +56,14 @@ is recorded for a relation that is not listed.
 2. Delete the project's copy of `DataChangeRecordDataExtension`. The module applies `DataChangeRecordExtension` to
    `DataChangeRecord` itself.
 3. Rename the class names in the project's config (the class map below).
-4. Run `dev/build flush=1`. The build does three things (see "Data migration"):
+4. Run `dev/build flush=1` twice. The first build does three things (see "Data migration"):
    - rewrites the `ClassName` of existing change records to the new class;
    - moves grants of the old admin permission code in groups and roles to `CMS_ACCESS_DataChangeAdmin`;
    - moves pending pruning jobs to the new job class.
+
+   `ClassName` is an enum column, and the first build still allows the old class name in it. The second build
+   removes it. A rollback needs one build on the old code before the class name is written back; see
+   [docs/en/ADOPTING.md](docs/en/ADOPTING.md), "Rollback".
 
 ### Class map
 
