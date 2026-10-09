@@ -30,8 +30,8 @@ by changing the constraint from `^1.0` to `^2.0`. The characterization goldens a
   through `getOwner()`.
 - `TrackedManyManyList::add(mixed $item, array $extraFields = []): void`, with `#[\Override]`. Silverstripe 6 declares
   `add()` without a return value. `remove()` keeps the signature of the parent.
-- `SiteTreeChangeRecordable` adds the Published States tab with `addFieldToTab()`. On Silverstripe 6 `addFieldsToTab()`
-  takes an array of fields.
+- `SiteTreeChangeRecordable` adds the Published States grid with `addFieldsToTab()`, given an array of fields as
+  Silverstripe 6 requires.
 - Change records read form field values with `getValue()`. Silverstripe 6 removed `FormField::Value()`.
 - Change records are written with `skipValidation`, after their values are cut to the size of their columns.
   Silverstripe 6 rejects a value that is too long instead of cutting it. The stored values are the same.
@@ -40,8 +40,6 @@ by changing the constraint from `^1.0` to `^2.0`. The characterization goldens a
 - `CleanupDataChangeHistoryTask` is a Silverstripe 6 build task. Its command name is
   `Dynamic-ChangeTracker-Job-CleanupDataChangeHistoryTask` (run with `sake tasks:` and that name). Its options
   (`older`, `run` and `force`) are declared with `getOptions()`, and the task runs in `execute()`.
-- `PruneChangesBeforeJob` declares its `priorTo` and `pruneBefore` properties. They stay public, so queued jobs written
-  before the upgrade still unserialise.
 - `phpunit.xml.dist` uses the PHPUnit 11 schema (`source` instead of `coverage`) and keeps `failOnWarning`.
 
 ### Intentional behaviour changes (line 2)
@@ -97,8 +95,6 @@ with the Dynamic fork of it (`dynamic/silverstripe-datachange-tracker`, branch `
 
 ### Fixed
 
-- `PruneChangesBeforeJob` declares the `priorTo` and `pruneBefore` properties it sets, which PHP 8.2 reports as dynamic
-  properties. They stay public, so queued jobs stored before the change still load.
 - `AffectedPagesService` reads a has_one relation as a list of one object instead of iterating the object through
   `ViewableData::getIterator()`, which Silverstripe 5.2 deprecated. The pages found are unchanged.
 

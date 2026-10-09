@@ -441,5 +441,6 @@ Line `2` is not released yet. These notes were checked against `silverstripe/fra
    `vendor/bin/sake tasks:Dynamic-ChangeTracker-Job-CleanupDataChangeHistoryTask --older="-6 months"`, and add
    `--run` to delete. Its `run` and `force` options are booleans on line `2`: `run=false` and `run=no` leave it as a
    dry run.
-10. **Queued pruning jobs.** The job's `priorTo` and `pruneBefore` properties stay public, so a pending
-    `PruneChangesBeforeJob` row keeps the property names it was stored with. Check the row after the build.
+10. **Queued pruning jobs.** The build changes only the `Implementation` of a pending `PruneChangesBeforeJob` row.
+    The job's `priorTo` and `pruneBefore` values stay in the row's stored job data, so the job keeps the date it
+    was queued with. Check the row after the build.
