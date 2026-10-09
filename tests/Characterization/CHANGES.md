@@ -110,3 +110,33 @@ warning, missed the "already linked" check, and an int id missed the extra data 
   after the records. They were never shown anywhere.
 - `CleanupDataChangeHistoryTaskTest::testPrunesBelowTheNewestOldRecord` checks the same for the task, which also
   prints how many join rows it removed.
+
+## Line 2 (Silverstripe 6) test differences
+
+Silverstripe 6 removed or changed the APIs these tests used. Each change below asserts the same behaviour through the
+Silverstripe 6 API, with no weaker assertion. The golden files are unchanged from line 1.
+
+- `LegacyMigrationTest` and `Fixtures\RemapExposingDatabaseAdmin`: the fixture extends `SilverStripe\Dev\Command\DbBuild`
+  instead of `SilverStripe\ORM\DatabaseAdmin`, which Silverstripe 6 does not have. The build runs the ClassName remapping
+  in `DbBuild`, and the fixture reads the `DbBuild` remapping configuration. `testBuildRemapRewritesLegacyRows` asserts
+  the same rows.
+- `DataChangeRecordCMSFieldsTest::testUserFieldShowsNameAndEmail`, `testChangedValuesAreHtmlTextWithInsDel` and
+  `testMissingForTemplateReplaced`: `Value()` is `getValue()`. Silverstripe 6 form fields have no `Value()`, and the
+  module reads field values with `getValue()` in `DataChangeRecord::getCMSFields()`. The asserted values are the same.
+- `Fixtures\ObjectValueReadonlyField` overrides `getValue()` instead of `Value()`, for the same reason. It still returns
+  the object only when the Referer field has no value, so the module still replaces it with
+  `[Missing stdClass::forTemplate]`, and `testMissingForTemplateReplaced` asserts that value.
+- `CharacterizationTestCase::makePlain()` takes a `$skipValidation` argument. `testLongValuesTruncated` and
+  `testLongMultibyteValuesMatchDatabaseTruncation` pass it for the long titles, and `testTrackCutsValuesBeforeWriting`
+  does too. `testObjectTitleNonStringCast` writes its integer title with `skipValidation`. Silverstripe 6 validates the
+  title on write (length and type), so the fixture write failed before the module ran. The assertions are unchanged:
+  they check the values the module stores and cuts.
+- `DataChangeRecordCMSFieldsTest::testNestedJsonCurrentBehaviour` and `DataChangeCMSTest::testCMSFieldsWithJSONDataCurrentlyThrows`:
+  the TypeError for a nested JSON value is raised by `SilverStripe\ORM\FieldType\DBField::XML()` ("Return value must be of
+  type string, array returned") instead of `nl2br()`. The defect is unchanged: the edit form of such a record still throws
+  a TypeError, and the tests still assert it.
+- `Fixtures\LegacySiteDataChangeRecordExtension` (the verbatim site copy): a has_one relation is wrapped as a one-page list
+  by `asList()`, as `AffectedPagesService` does. Silverstripe 5 iterated a has_one object as a list of itself. Silverstripe
+  6 models are not iterable, so the copy loop finds no pages, and a site copy loses its has_one affected pages on
+  Silverstripe 6. The wrap keeps the copy at the Silverstripe 5 result, so `AffectedPagesParityTest` and
+  `LiveLastEditedPropagatorTest` compare the module with the behaviour the sites had.
