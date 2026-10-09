@@ -9,6 +9,12 @@ Line `1` supports Silverstripe CMS 5, line `2` Silverstripe CMS 6. Class names a
 Line `2` for Silverstripe CMS 6. Class names, table names and configuration are the same as line `1`, so a site moves
 by changing the constraint from `^1.0` to `^2.0`. The characterization goldens are byte-identical on both lines.
 
+### Security
+
+- Sites should require at least `silverstripe/framework` `6.2.2`, `silverstripe/cms` `6.2.1` and `silverstripe/versioned`
+  `3.2.1`. These are the releases that fix CVE-2026-54720, CVE-2026-54717 and CVE-2026-55779. The module's own
+  constraints stay `^6`, so the floors belong in the site's `composer.json`.
+
 ### Requirements
 
 - `silverstripe/framework` `^6`, `silverstripe/cms` `^6`, `silverstripe/versioned` `^3`, `silverstripe/admin` `^3`.
