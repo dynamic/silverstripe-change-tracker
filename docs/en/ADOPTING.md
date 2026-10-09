@@ -90,8 +90,9 @@ Each site's `app/_config/changetracker.yml` is replaced. The rules:
   property is read from the Injector instance as `trackedRelationships`; it is not a config key (see "Notes on
   the property name" below).
 - `Symbiote\DataChange\Model\DataChangeRecord` becomes `Dynamic\ChangeTracker\Model\DataChangeRecord`. Its extension
-  is removed, because the module applies `DataChangeRecordExtension` itself. `field_blacklist: [SearchContent]` is
-  kept as it is.
+  is removed, because the module applies `DataChangeRecordExtension` itself. A site's
+  `field_blacklist: [SearchContent]` is redundant: the module's default is `[Password, SearchContent]`, and a site's
+  list is merged with it. Keeping or removing the entry changes nothing.
 
 ### MWTR
 
@@ -99,16 +100,13 @@ Each site's `app/_config/changetracker.yml` is replaced. The rules:
 ---
 name: mwtr-change-tracker-config
 ---
-Dynamic\ChangeTracker\Model\DataChangeRecord:
-  field_blacklist:
-    - SearchContent
-
 SilverStripe\CMS\Model\SiteTree:
   extensions:
     - Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable
 ```
 
-The `MWTR\DataChangeRecordDataExtension` line goes. MWTR has no `trackedRelationships`, so none is set.
+The `MWTR\DataChangeRecordDataExtension` line goes, and so does the `field_blacklist` block, which the module default
+covers. MWTR has no `trackedRelationships`, so none is set.
 
 ### AE
 
