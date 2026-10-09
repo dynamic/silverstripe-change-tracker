@@ -138,7 +138,7 @@ class DataChangeRecord extends DataObject
 
         if (strlen($this->Before) && strlen($this->ChangeRecordClass) && class_exists($this->ChangeRecordClass)) {
             $decodedBefore = json_decode($this->Before);
-            $decodedAfter  = json_decode($this->After);
+            $decodedAfter  = json_decode((string) $this->After);
 
             $before = Injector::inst()->create($this->ChangeRecordClass, $decodedBefore);
             $after  = Injector::inst()->create($this->ChangeRecordClass, $decodedAfter);
