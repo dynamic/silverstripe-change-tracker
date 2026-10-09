@@ -24,6 +24,19 @@ it is not released yet; its section lists what is different on SS6.
 
 Moving from line `1` to line `2` is the constraint change `^1` to `^2`. The config keys are the same.
 
+### Constraint before a tagged release
+
+No release of either line is tagged yet, so there is no stable version for `^1.0` or `^2.0` to select. Until a release
+exists, require the development version of the line, which follows its branch:
+
+| Module line | Until the release is tagged | After |
+|---|---|---|
+| `1` | `"dynamic/silverstripe-change-tracker": "1.x-dev"` | `"^1.0"` once `1.0.0` is tagged |
+| `2` | `"dynamic/silverstripe-change-tracker": "2.x-dev"` | `"^2.0"` once `2.0.0` is tagged |
+
+The lock file pins the commit, so a site gets a newer commit of the branch only through a scoped update of the
+package.
+
 ## Before you start (every site, every line)
 
 1. Start from a clean working tree. Make a database snapshot and a backup of the assets. Record the baseline with the
@@ -37,17 +50,19 @@ Moving from line `1` to line `2` is the constraint change `^1` to `^2`. The conf
    ```json
    {
        "type": "vcs",
-       "url": "git@github.com:dynamic/silverstripe-change-tracker.git"
+       "url": "https://github.com/dynamic/silverstripe-change-tracker.git"
    }
    ```
 
-   Packagist publication is a separate step that is not part of this milestone.
+   The repository is public, so the HTTPS URL needs no SSH key on the servers or in CI. Packagist publication is a
+   separate step that is not part of this milestone.
 
 ## Step 1: composer.json
 
-1. Remove the require line `"symbiote/silverstripe-datachange-tracker"` and the VCS repository whose URL is
+1. Remove the require line `"symbiote/silverstripe-datachange-tracker"` and the fork's VCS repository, whose URL is
    `git@github.com:dynamic/silverstripe-datachange-tracker.git`.
-2. Add `"dynamic/silverstripe-change-tracker": "^1.0"` (or `"1.x-dev"` until `1.0.0` is tagged).
+2. Add `"dynamic/silverstripe-change-tracker": "1.x-dev"`. Change it to `"^1.0"` once `1.0.0` is tagged (see
+   "Constraint before a tagged release").
 3. Run a scoped update, and do not run `composer remove` or an unscoped `composer update`:
 
    ```
@@ -412,7 +427,8 @@ in the Injector block as shown.
 
 Line `2` is not cut yet. These notes apply once it is released.
 
-1. Change the constraint from `^1.0` to `^2.0`. The config keys and class names are the same.
+1. Change the constraint to line `2`: `2.x-dev` until `2.0.0` is tagged, `^2.0` after (see "Constraint before a tagged
+   release"). The config keys and class names are the same.
 2. Composer: the site's PHP is `^8.3`, and the framework and CMS packages move to `^6`. The rest of the stack follows
    the site's own SS6 upgrade plan.
 3. **Hook renames.** On SS6 `MetaComponents` is called as `updateMetaComponents`.
