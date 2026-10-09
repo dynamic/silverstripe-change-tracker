@@ -41,6 +41,8 @@ is recorded for a relation that is not listed.
    unscoped update.
 2. Delete the project's copy of `DataChangeRecordDataExtension`. The module applies `DataChangeRecordExtension` to
    `DataChangeRecord` itself.
+   On Silverstripe 6 a copy also loses the has_one affected pages: a model is not iterable, so a `foreach` over a has_one
+   relation finds nothing. Delete the copy rather than porting it. The module reads has_one relations as one-page lists.
 3. Rename the class names in the project's config (the class map below).
 4. Run `dev/build flush=1`. The build does three things (see "Data migration"):
    - rewrites the `ClassName` of existing change records to the new class;
