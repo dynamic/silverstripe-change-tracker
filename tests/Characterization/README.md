@@ -27,7 +27,7 @@ is set, so a pipeline can never rewrite the expected output.
 
 ## Running
 
-The suite needs a SilverStripe 5 project around the module and a database user that can create databases:
+The suite needs a SilverStripe 6 project around the module and a database user that can create databases:
 
     vendor/bin/phpunit
 
