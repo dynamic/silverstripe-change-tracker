@@ -12,7 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Runs a build task with the given parameters and returns what it printed. Running a task differs between
- * Silverstripe 5 and 6, so this is the one test file that differs between the module's release lines.
+ * Silverstripe 5 and 6, so this file differs between the module's release lines. It is the only file in tests/Support
+ * that does; tests/Characterization/CHANGES.md ("Line 2") lists every test difference between the lines.
  *
  * Silverstripe 6 has BuildTask::run() wrap the task's own output in a heading and a timing line, so this calls
  * execute() directly and captures the HTML output the task writes, as the HTTP route would give it.

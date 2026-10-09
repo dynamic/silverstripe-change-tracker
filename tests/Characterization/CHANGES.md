@@ -144,6 +144,8 @@ Silverstripe 6 API, with no weaker assertion. The golden files are unchanged fro
   around `execute()`. The helper calls `execute()` directly through a `PolyOutput` in HTML format and returns only what the
   task wrote, so the exact-output assertions in `CleanupDataChangeHistoryTaskTest` compare the task's own output. Line 1
   keeps `ob_start()` around `run()`. This is the only file in `tests/Support` that differs between the lines.
+- `tests/Characterization/README.md`: the "Running" section names a Silverstripe 6 project instead of a Silverstripe 5
+  one. Documentation only; no test or golden file changes with it.
 - `Characterization\HostileValuesTest` (line 2 only, 3 tests): a change record with no member, an integer title, and a
   body that is not valid UTF-8. The file's docblock records that these exist on line 2 only because Silverstripe 6 is
   stricter about these values than Silverstripe 5. This is added coverage: it replaces no line 1 assertion. The tests

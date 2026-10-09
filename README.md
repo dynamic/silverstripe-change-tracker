@@ -22,11 +22,24 @@ Optional modules:
 
 ## Install
 
-The package is not on Packagist yet. Add the repository to `composer.json`, then require the line:
+The package is not on Packagist yet. Add the repository to `composer.json`:
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/dynamic/silverstripe-change-tracker.git"
+    }
+]
+```
+
+No release is tagged yet, so require the development version of the line, which follows its branch:
 
 ```
-composer require dynamic/silverstripe-change-tracker:^1.0
+composer require dynamic/silverstripe-change-tracker:1.x-dev
 ```
+
+Use `2.x-dev` for line `2`. Once `1.0.0` or `2.0.0` is tagged, the constraint becomes `^1.0` or `^2.0`.
 
 The module adds its configuration with the `Only` rules it needs; there is nothing to copy into the project.
 
@@ -35,8 +48,9 @@ is recorded for a relation that is not listed.
 
 ## Upgrading from symbiote/silverstripe-datachange-tracker or the Dynamic fork
 
-1. In `composer.json`, remove the old package and its VCS repository, and require
-   `dynamic/silverstripe-change-tracker:^1.0`. Then run a scoped update,
+1. In `composer.json`, remove the old package and its VCS repository, add the repository above, and require the
+   line's development version: `dynamic/silverstripe-change-tracker:1.x-dev` on Silverstripe 5, `2.x-dev` on
+   Silverstripe 6 (`^1.0` or `^2.0` once tagged). Then run a scoped update,
    `composer update dynamic/silverstripe-change-tracker --with-dependencies`, and check the lock diff. Do not run an
    unscoped update.
 2. Delete the project's copy of `DataChangeRecordDataExtension`. The module applies `DataChangeRecordExtension` to
@@ -44,10 +58,14 @@ is recorded for a relation that is not listed.
    On Silverstripe 6 a copy also loses the has_one affected pages: a model is not iterable, so a `foreach` over a has_one
    relation finds nothing. Delete the copy rather than porting it. The module reads has_one relations as one-page lists.
 3. Rename the class names in the project's config (the class map below).
-4. Run `dev/build flush=1`. The build does three things (see "Data migration"):
+4. Run `dev/build flush=1` twice. The first build does three things (see "Data migration"):
    - rewrites the `ClassName` of existing change records to the new class;
    - moves grants of the old admin permission code in groups and roles to `CMS_ACCESS_DataChangeAdmin`;
    - moves pending pruning jobs to the new job class.
+
+   `ClassName` is an enum column, and the first build still allows the old class name in it. The second build
+   removes it. A rollback needs one build on the old code before the class name is written back; see
+   [docs/en/ADOPTING.md](docs/en/ADOPTING.md), "Rollback".
 
 ### Class map
 
