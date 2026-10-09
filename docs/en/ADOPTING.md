@@ -24,12 +24,26 @@ it is not released yet; its section lists what is different on SS6.
 
 Moving from line `1` to line `2` is the constraint change `^1` to `^2`. The config keys are the same.
 
+### Constraint before a tagged release
+
+No release of either line is tagged yet, so there is no stable version for `^1.0` or `^2.0` to select. Until a release
+exists, require the development version of the line, which follows its branch:
+
+| Module line | Until the release is tagged | After |
+|---|---|---|
+| `1` | `"dynamic/silverstripe-change-tracker": "1.x-dev"` | `"^1.0"` once `1.0.0` is tagged |
+| `2` | `"dynamic/silverstripe-change-tracker": "2.x-dev"` | `"^2.0"` once `2.0.0` is tagged |
+
+The lock file pins the commit, so a site gets a newer commit of the branch only through a scoped update of the
+package.
+
 ## Before you start (every site, every line)
 
 1. Start from a clean working tree. Make a database snapshot and a backup of the assets. Record the baseline with the
    queries in "Verification SQL" below.
 2. Run the read-only checks:
-   - `grep -rn 'Symbiote' app/_config app/src app/tests` lists every reference to be changed.
+   - `grep -rnE 'Symbiote.DataChange' app/_config app/src` lists every reference to be changed. References in the
+     site's tests and its regression suite are not changed (see Step 4).
    - `SELECT COUNT(*) FROM Permission WHERE Code = 'CMS_ACCESS_DataChangeAdmin';` must be `0`. The build migrates the
      old code to this one, so a site that already holds it would not be migrated cleanly.
 3. Have the new package reachable. Until the module is listed on Packagist, add a VCS repository for it:
@@ -37,17 +51,19 @@ Moving from line `1` to line `2` is the constraint change `^1` to `^2`. The conf
    ```json
    {
        "type": "vcs",
-       "url": "git@github.com:dynamic/silverstripe-change-tracker.git"
+       "url": "https://github.com/dynamic/silverstripe-change-tracker.git"
    }
    ```
 
-   Packagist publication is a separate step that is not part of this milestone.
+   The repository is public, so the HTTPS URL needs no SSH key on the servers or in CI. Packagist publication is a
+   separate step that is not part of this milestone.
 
 ## Step 1: composer.json
 
-1. Remove the require line `"symbiote/silverstripe-datachange-tracker"` and the VCS repository whose URL is
+1. Remove the require line `"symbiote/silverstripe-datachange-tracker"` and the fork's VCS repository, whose URL is
    `git@github.com:dynamic/silverstripe-datachange-tracker.git`.
-2. Add `"dynamic/silverstripe-change-tracker": "^1.0"` (or `"1.x-dev"` until `1.0.0` is tagged).
+2. Add `"dynamic/silverstripe-change-tracker": "1.x-dev"`. Change it to `"^1.0"` once `1.0.0` is tagged (see
+   "Constraint before a tagged release").
 3. Run a scoped update, and do not run `composer remove` or an unscoped `composer update`:
 
    ```
@@ -75,8 +91,9 @@ Each site's `app/_config/changetracker.yml` is replaced. The rules:
   property is read from the Injector instance as `trackedRelationships`; it is not a config key (see "Notes on
   the property name" below).
 - `Symbiote\DataChange\Model\DataChangeRecord` becomes `Dynamic\ChangeTracker\Model\DataChangeRecord`. Its extension
-  is removed, because the module applies `DataChangeRecordExtension` itself. `field_blacklist: [SearchContent]` is
-  kept as it is.
+  is removed, because the module applies `DataChangeRecordExtension` itself. A site's
+  `field_blacklist: [SearchContent]` is redundant: the module's default is `[Password, SearchContent]`, and a site's
+  list is merged with it. Keeping or removing the entry changes nothing.
 
 ### MWTR
 
@@ -84,16 +101,13 @@ Each site's `app/_config/changetracker.yml` is replaced. The rules:
 ---
 name: mwtr-change-tracker-config
 ---
-Dynamic\ChangeTracker\Model\DataChangeRecord:
-  field_blacklist:
-    - SearchContent
-
 SilverStripe\CMS\Model\SiteTree:
   extensions:
     - Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable
 ```
 
-The `MWTR\DataChangeRecordDataExtension` line goes. MWTR has no `trackedRelationships`, so none is set.
+The `MWTR\DataChangeRecordDataExtension` line goes, and so does the `field_blacklist` block, which the module default
+covers. MWTR has no `trackedRelationships`, so none is set.
 
 ### AE
 
@@ -288,17 +302,30 @@ same order.
 AE has no last-modified code. AP's `Seo/PageSeoExtension.php` and `Extension/BlogPostDataExtension.php` have
 `MetaComponents(&$tags)`; those stay as they are on SS5. The SS6 rename is covered in the SS6 section.
 
-## Step 4: tests and README
+## Step 4: tests, regression baselines and README
 
-- MWTR: `app/tests/Cms/AdminScreensTest.php` and `app/tests/Tracker/TrackerSchemaTest.php` name the old class and the old
-  permission code (`CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin`). Update them to the new names, and keep the
-  assertion that the old code is migrated.
+- The site's tests and its regression suite record what the site did before the swap. Their assertions, expected
+  outputs and recorded baselines are not edited, also where they name the old class or the old permission code
+  (`CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin`). The swap is not a reason to record them again.
+- Each intended difference of the swap is registered as a known difference in the site's regression suite, in a
+  reviewed change, with the value before, the value after and the reason. A registered difference must be observed
+  by the run at the stage it applies to, and a difference that is not registered fails the run. The differences the
+  swap causes:
+  - the permission code of the Data Changes admin (`CMS_ACCESS_DataChangeAdmin`);
+  - the class names in the admin's menu item ID and in the links to a single change record
+    (`Dynamic-ChangeTracker-...` instead of `Symbiote-DataChange-...`);
+  - the stored `ClassName` of the change records;
+  - the warnings that the fork raised and the module does not (a tracked write with nobody logged in, a many_many add
+    by string ID), where the suite records warnings.
 - Every site: the README names the fork. Replace it with the module and this guide.
 
 ## Step 5: build and verify
 
 1. Commit the changes (see "Rules for commits" below). Commit before the build.
-2. Run `ddev sake dev/build flush=1` (SS5 uses `sake`, no `vendor/bin/sake`).
+2. Run the build twice: `ddev sake dev/build flush=1`, then the same command again. `DataChangeRecord.ClassName` is an
+   enum column. The first build adds the new class name to it and then rewrites the rows; the old class name stays
+   allowed in that build, because rows still held it when the table was checked. The second build removes the old
+   name from the column. Compare the schema and run the checks below after the second build.
 3. Run the verification SQL below, and compare with the baseline.
 4. Open Data Changes, a single change record, the Published States tab on one page, and `listpages` and `listdocs`
    as an administrator and as an editor. The Data Changes menu item, and records for a publish and a many_many change.
@@ -332,13 +359,14 @@ SELECT Implementation, COUNT(*) FROM QueuedJobDescriptor WHERE Implementation LI
 SELECT COUNT(*), SUM(UNIX_TIMESTAMP(LastEdited)) FROM SiteTree_Live;
 ```
 
-Expected after the build: the `ClassName` query returns one row, `Dynamic\ChangeTracker\Model\DataChangeRecord`; the
-orphan queries return 0; the permission queries return only `CMS_ACCESS_DataChangeAdmin`; the job query returns only
-`Dynamic\ChangeTracker\Job\PruneChangesBeforeJob`. The live checksum must equal the baseline (the build does not change
-`SiteTree_Live`). The change-record counts must equal the baseline plus the rows written by the site in between.
+Expected after the second build: the `ClassName` query returns one row,
+`Dynamic\ChangeTracker\Model\DataChangeRecord`; the orphan queries return 0; the permission queries return only
+`CMS_ACCESS_DataChangeAdmin`; the job query returns only `Dynamic\ChangeTracker\Job\PruneChangesBeforeJob`. The live
+checksum must equal the baseline (the build does not change `SiteTree_Live`). The change-record counts must equal the
+baseline plus the rows written by the site in between.
 
-Also confirm that `grep -rn 'Symbiote' app/_config app/src app/tests` lists only the references this guide keeps (none
-for the module), and that `SELECT ... WHERE Code = 'CMS_ACCESS_Symbiote%'` returns 0 rows.
+Also confirm that `grep -rnE 'Symbiote.DataChange' app/_config app/src` lists nothing (the site's tests keep the old
+names, see Step 4), and that `SELECT ... WHERE Code LIKE 'CMS_ACCESS_Symbiote%'` returns 0 rows.
 
 ## Rollback
 
@@ -346,8 +374,12 @@ Keep the baseline DB snapshot and the commit before the swap.
 
 1. Revert the commit. Run `ddev composer update symbiote/silverstripe-datachange-tracker --with-dependencies` after
    restoring the old `composer.json`, and check the lock diff.
-2. Reverse the data migration, after the build on the old code. Run it only if `CMS_ACCESS_DataChangeAdmin` was not
-   already granted before the swap (the pre-check above):
+2. Run one build on the old code, `ddev sake dev/build flush=1`, before the reverse update. `ClassName` is an enum
+   column: after the second build of the new code it allows only `Dynamic\ChangeTracker\Model\DataChangeRecord`, so
+   the reverse update fails with `Data truncated for column 'ClassName'`. The old code's build adds the old class name
+   to the column and keeps the stored values, because a value that rows still hold stays allowed.
+3. Reverse the data migration. Run the permission updates only if `CMS_ACCESS_DataChangeAdmin` was not already granted
+   before the swap (the pre-check above):
 
    ```sql
    UPDATE DataChangeRecord SET ClassName = 'Symbiote\\DataChange\\Model\\DataChangeRecord'
@@ -360,7 +392,9 @@ Keep the baseline DB snapshot and the commit before the swap.
        WHERE Implementation = 'Dynamic\\ChangeTracker\\Job\\PruneChangesBeforeJob';
    ```
 
-3. If the reverse update does not give the baseline counts, restore the database snapshot instead. Rows written after
+4. Run the build again, which removes the new class name from the column. The `ClassName` query of the verification
+   SQL then lists only `Symbiote\DataChange\Model\DataChangeRecord`.
+5. If the reverse update does not give the baseline counts, restore the database snapshot instead. Rows written after
    the snapshot are lost in that case, unless they are re-inserted from the dump of the live database first.
 
 Rehearse the rollback on a local copy before the production change.
@@ -382,8 +416,11 @@ in the Injector block as shown.
 
 - Relations: none tracked. `SiteTreeChangeRecordable` on SiteTree only. The six model files of Step 3.
 - HomePage: the duplicate-field audit (below) applies. The Card fields are removed before the FieldGroups on SS6.
-- Regression suite: its `expected` and `known-diffs` files name the old permission code and class. Update them with the
-  suite's own runner, as part of the same change.
+- Tests and regression suite: `app/tests` and the suite's baselines keep the fork's permission code and class names,
+  unedited. The swap's differences (Step 4) are registered as known differences of the module stage, and the run at
+  that stage observes each of them.
+- The build was run twice after the swap, and the rollback was rehearsed with the extra build on the old code (Step 5
+  and "Rollback").
 
 ### AE
 
@@ -412,7 +449,8 @@ in the Injector block as shown.
 
 Line `2` is not cut yet. These notes apply once it is released.
 
-1. Change the constraint from `^1.0` to `^2.0`. The config keys and class names are the same.
+1. Change the constraint to line `2`: `2.x-dev` until `2.0.0` is tagged, `^2.0` after (see "Constraint before a tagged
+   release"). The config keys and class names are the same.
 2. Composer: the site's PHP is `^8.3`, and the framework and CMS packages move to `^6`. The rest of the stack follows
    the site's own SS6 upgrade plan.
 3. **Hook renames.** On SS6 `MetaComponents` is called as `updateMetaComponents`.
@@ -429,4 +467,5 @@ Line `2` is not cut yet. These notes apply once it is released.
 5. **PasswordValidator.** The class is removed on SS6 and is fatal if configured. Use `RulesPasswordValidator` with the
    same rules (length, digits, letters) as the site's current validator.
 6. **TinyMCE 6** and the rest of the SS6 config changes follow the SS6 upgrade for the site.
-7. Run the verification SQL again after `dev/build flush=1`.
+7. Run the build twice, as in Step 5 (`vendor/bin/sake db:build --flush` on Silverstripe 6), and run the verification
+   SQL again after the second build.

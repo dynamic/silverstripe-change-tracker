@@ -2,12 +2,26 @@
 
 ## Install
 
-```
-composer require dynamic/silverstripe-change-tracker:^1.0
+Until the module is on Packagist, add its repository to `composer.json`:
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/dynamic/silverstripe-change-tracker.git"
+    }
+]
 ```
 
-Line `1` is for Silverstripe CMS 5. The module is applied by its own configuration, so no file in the project needs
-to change for it to run.
+No release is tagged yet, so require the development version of the line:
+
+```
+composer require dynamic/silverstripe-change-tracker:1.x-dev
+```
+
+Line `1` (`1.x-dev`) is for Silverstripe CMS 5, line `2` (`2.x-dev`) for Silverstripe CMS 6. Once a release is tagged,
+use `^1.0` or `^2.0`. The module is applied by its own configuration, so no file in the project needs to change for
+it to run.
 
 ## Track a data object
 
