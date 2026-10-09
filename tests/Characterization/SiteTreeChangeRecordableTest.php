@@ -174,4 +174,19 @@ class SiteTreeChangeRecordableTest extends CharacterizationTestCase
         $this->assertSame(['New', 'Publish', 'Delete from Live', 'Unpublish'], $this->types($object));
         $this->assertSame(TrackedObject::class, $this->lastRecord()->ChangeRecordClass);
     }
+
+    /**
+     * Applying the extension to fields that already hold the grid replaces it, so the tab keeps a single grid
+     */
+    public function testPublishedStatesTabHoldsOneGridWhenTheExtensionAppliesTwice()
+    {
+        $page = $this->lifecyclePage();
+        $fields = $page->getCMSFields();
+        $page->extend('updateCMSFields', $fields);
+
+        $names = array_map(function ($field) {
+            return $field->getName();
+        }, $fields->fieldByName('Root.PublishedState')->FieldList()->toArray());
+        $this->assertSame(['PublishStates'], $names);
+    }
 }

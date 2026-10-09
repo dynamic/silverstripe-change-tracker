@@ -60,7 +60,7 @@ class SiteTreeChangeRecordable extends ChangeRecordable
 
             //linking through to the datachanges modeladmin
 
-            $fields->addFieldToTab('Root.PublishedState', $publishedGrid);
+            $fields->addFieldsToTab('Root.PublishedState', [$publishedGrid]);
             return $fields;
         }
     }

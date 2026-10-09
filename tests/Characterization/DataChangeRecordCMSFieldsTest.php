@@ -8,6 +8,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use TypeError;
 use Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable;
@@ -231,6 +232,36 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
         $fields = $record->getCMSFields();
 
         $this->assertInstanceOf(FieldList::class, $fields);
+        $this->assertSame([], $this->takeWarnings());
+    }
+
+    /**
+     * A stored row can have no After value. The screen still renders its sections, and decoding the missing value
+     * raises no deprecation.
+     */
+    public function testNullAfterRowRendersWithoutDeprecation()
+    {
+        $record = $this->changeRecord();
+        DB::prepared_query('UPDATE "DataChangeRecord" SET "After" = NULL WHERE "ID" = ?', [$record->ID]);
+        $record = DataChangeRecord::get()->byID($record->ID);
+        $this->assertNull($record->After);
+
+        $deprecations = [];
+        set_error_handler(function ($errno, $errstr) use (&$deprecations) {
+            if (in_array($errno, [E_DEPRECATED, E_USER_DEPRECATED], true)) {
+                $deprecations[] = $errstr;
+                return true;
+            }
+            return false;
+        });
+        try {
+            $fields = $record->getCMSFields();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame(['Details', 'FieldChanges', 'RawData', 'HookMarker'], $this->names($fields));
+        $this->assertSame([], $deprecations);
         $this->assertSame([], $this->takeWarnings());
     }
 }
