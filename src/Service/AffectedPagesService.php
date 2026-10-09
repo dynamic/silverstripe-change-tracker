@@ -4,6 +4,8 @@ namespace Dynamic\ChangeTracker\Service;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Core\Injector\Injectable;
 use Dynamic\ChangeTracker\Model\DataChangeRecord;
 
@@ -91,7 +93,7 @@ class AffectedPagesService
 
         foreach ($relations as $relation => $class) {
             if (is_subclass_of($class, SiteTree::class)) {
-                $relatedPages = $changeRecord->ChangeRecord()->$relation();
+                $relatedPages = $this->asList($changeRecord->ChangeRecord()->$relation());
                 foreach ($relatedPages as $page) {
                     if ($page instanceof SiteTree) {
                         if (!array_key_exists($page->ID, $affectedPages) && $page->ID > 0) {
@@ -100,7 +102,7 @@ class AffectedPagesService
                     }
                 }
             } elseif ($elementClass && is_subclass_of($class, $elementClass)) {
-                $relatedElements = $changeRecord->ChangeRecord()->$relation();
+                $relatedElements = $this->asList($changeRecord->ChangeRecord()->$relation());
                 foreach ($relatedElements as $element) {
                     if ($element->hasMethod('getPage')) {
                         $elementPage = $element->getPage();
@@ -113,6 +115,24 @@ class AffectedPagesService
                 }
             }
         }
+    }
+
+    /**
+     * The value of a relation as a list. A has_one relation gives one object, which Silverstripe 5 iterated as a list of
+     * itself (ViewableData was IteratorAggregate). Silverstripe 6 models are not iterable, so the object is wrapped here.
+     *
+     * @param mixed $relation a list, a single object, or nothing
+     * @return iterable
+     */
+    private function asList($relation): iterable
+    {
+        if ($relation instanceof SS_List) {
+            return $relation;
+        }
+        if ($relation instanceof DataObject) {
+            return [$relation];
+        }
+        return [];
     }
 
     /**

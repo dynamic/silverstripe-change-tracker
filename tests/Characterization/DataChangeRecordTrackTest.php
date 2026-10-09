@@ -2,6 +2,7 @@
 
 namespace Dynamic\ChangeTracker\Tests\Characterization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
@@ -412,7 +413,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
     /**
      * @return array[] field name => [field name], so the data provider only returns strings
      */
-    public function longValueProvider(): array
+    public static function longValueProvider(): array
     {
         return [
             'ObjectTitle' => ['ObjectTitle', 255],
@@ -429,6 +430,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
      *
      * @dataProvider longValueProvider
      */
+    #[DataProvider('longValueProvider')]
     public function testLongValuesTruncated(string $field, int $limit)
     {
         $long = str_repeat('x', 400);
@@ -456,7 +458,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
             $this->trackService()->track($object, 'Custom ' . $long);
             $record = $this->lastRecord();
         } else {
-            $plain = $this->makePlain($title);
+            $plain = $this->makePlain($title, [], true);
             $record = $this->recordsFor($plain)[0];
         }
 
@@ -469,6 +471,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
      *
      * @dataProvider longValueProvider
      */
+    #[DataProvider('longValueProvider')]
     public function testLongMultibyteValuesMatchDatabaseTruncation(string $field, int $limit)
     {
         $long = str_repeat('é€', 150) . str_repeat('x', 100);
@@ -497,7 +500,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
             $this->trackService()->track($object, $sent);
             $record = $this->lastRecord();
         } else {
-            $plain = $this->makePlain($title);
+            $plain = $this->makePlain($title, [], true);
             $record = $this->recordsFor($plain)[0];
             $sent = [
                 'ObjectTitle' => $title,
@@ -527,7 +530,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
 
     public function testTrackCutsValuesBeforeWriting()
     {
-        $plain = $this->makePlain(str_repeat('é', 300));
+        $plain = $this->makePlain(str_repeat('é', 300), [], true);
         $_SERVER['HTTP_USER_AGENT'] = str_repeat('a', 300);
         $_SERVER['REMOTE_ADDR'] = str_repeat('1', 300);
 
@@ -545,7 +548,7 @@ class DataChangeRecordTrackTest extends CharacterizationTestCase
     public function testObjectTitleNonStringCast()
     {
         $plain = PlainRecordable::create(['Title' => 42]);
-        $plain->write();
+        $plain->write(skipValidation: true);
 
         $record = $this->lastRecord();
         $this->assertSame('42', $record->ObjectTitle);

@@ -184,7 +184,7 @@ class DataChangeRecord extends DataObject
         // into a field and break the page.
         $fieldsToRemove = [];
         foreach ($fields->dataFields() as $field) {
-            $value = $field->Value();
+            $value = $field->getValue();
             if ($value && is_object($value)) {
                 if (
                     (method_exists($value, 'hasMethod') && !$value->hasMethod('forTemplate')) || !method_exists(
@@ -311,7 +311,9 @@ class DataChangeRecord extends DataObject
             $this->$field = $this->truncateToFieldSize($field, $this->$field);
         }
 
-        $this->write();
+        // Values are cut to their column size above, so the length validation Silverstripe 6 runs on write has nothing
+        // to reject. Skipping it keeps a change record from failing to save, which would lose the change.
+        $this->write(skipValidation: true);
 
         if ($this->hasMethod('getAffectedPageRecords')) {
             $this->AffectedPages()->addMany($this->getAffectedPageRecords() ?? []);

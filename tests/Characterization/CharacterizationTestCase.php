@@ -333,10 +333,14 @@ abstract class CharacterizationTestCase extends FunctionalTest
         return $child;
     }
 
-    protected function makePlain(string $title, array $data = []): PlainRecordable
+    /**
+     * @param bool $skipValidation for a title the Silverstripe 6 validation rejects (longer than the column, or not a
+     *                              string), which a test writes on purpose
+     */
+    protected function makePlain(string $title, array $data = [], bool $skipValidation = false): PlainRecordable
     {
         $plain = PlainRecordable::create(array_merge(['Title' => $title], $data));
-        $plain->write();
+        $plain->write(skipValidation: $skipValidation);
         $this->resetTracking();
         return $plain;
     }

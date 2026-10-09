@@ -6,6 +6,8 @@ use DNADesign\Elemental\Models\BaseElement;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Model\List\SS_List;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 
 class LegacySiteDataChangeRecordExtension extends Extension
@@ -185,7 +187,7 @@ class LegacySiteDataChangeRecordExtension extends Extension
     {
         foreach ($relations as $relation => $class) {
             if (is_subclass_of($class, SiteTree::class)) {
-                $relatedPages = $this->getOwner()->ChangeRecord()->$relation();
+                $relatedPages = $this->asList($this->getOwner()->ChangeRecord()->$relation());
                 foreach ($relatedPages as $page) {
                     if ($page instanceof SiteTree) {
                         if (!array_key_exists($page->ID, $affectedPages) && $page->ID > 0) {
@@ -194,7 +196,7 @@ class LegacySiteDataChangeRecordExtension extends Extension
                     }
                 }
             } elseif (class_exists(BaseElement::class) && is_subclass_of($class, BaseElement::class)) {
-                $relatedElements = $this->getOwner()->ChangeRecord()->$relation();
+                $relatedElements = $this->asList($this->getOwner()->ChangeRecord()->$relation());
                 foreach ($relatedElements as $element) {
                     if ($element->hasMethod('getPage')) {
                         $elementPage = $element->getPage();
@@ -207,6 +209,24 @@ class LegacySiteDataChangeRecordExtension extends Extension
                 }
             }
         }
+    }
+
+    /**
+     * Silverstripe 5 iterated a has_one object as a list of itself. Silverstripe 6 models are not iterable, so a
+     * has_one object is wrapped as a list here, as the module does. Without this the site copy finds no has_one pages.
+     *
+     * @param mixed $relation a list, a single object, or nothing
+     * @return iterable
+     */
+    private function asList($relation): iterable
+    {
+        if ($relation instanceof SS_List) {
+            return $relation;
+        }
+        if ($relation instanceof DataObject) {
+            return [$relation];
+        }
+        return [];
     }
 
     /**

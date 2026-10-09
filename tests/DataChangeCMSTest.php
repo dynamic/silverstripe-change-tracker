@@ -88,7 +88,7 @@ class DataChangeCMSTest extends FunctionalTest
 
         $this->logInWithPermission('ADMIN');
         $this->expectException(TypeError::class);
-        $this->expectExceptionMessage('nl2br(): Argument #1 ($string) must be of type string, array given');
+        $this->expectExceptionMessage('DBField::XML(): Return value must be of type string, array returned');
         $this->get(sprintf(self::EDIT_LINK, $ids[0]));
     }
 }

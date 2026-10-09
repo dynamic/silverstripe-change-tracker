@@ -410,7 +410,8 @@ in the Injector block as shown.
 
 ## Silverstripe CMS 6 (line 2)
 
-Line `2` is not cut yet. These notes apply once it is released.
+Line `2` is not released yet. These notes were checked against `silverstripe/framework` 6.2.11 and
+`silverstripe/cms` 6.2.5, with `silverstripe/versioned` 3.2.2, `silverstripe/admin` 3.2.5 and PHPUnit 11.5.
 
 1. Change the constraint from `^1.0` to `^2.0`. The config keys and class names are the same.
 2. Composer: the site's PHP is `^8.3`, and the framework and CMS packages move to `^6`. The rest of the stack follows
@@ -426,7 +427,19 @@ Line `2` is not cut yet. These notes apply once it is released.
      and `$has_one` names of the class;
    - for each name that is both scaffolded and added again, `removeByName` it before the group is built.
    - MWTR's HomePage (the nine Card fields) is the known case.
-5. **PasswordValidator.** The class is removed on SS6 and is fatal if configured. Use `RulesPasswordValidator` with the
-   same rules (length, digits, letters) as the site's current validator.
+5. **PasswordValidator.** `SilverStripe\Security\PasswordValidator` no longer exists on SS6, and configuring it is
+   fatal. The base class is `SilverStripe\Security\Validation\PasswordValidator`. Use
+   `SilverStripe\Security\Validation\RulesPasswordValidator` with the same rules (length, digits, letters) as the
+   site's current validator.
 6. **TinyMCE 6** and the rest of the SS6 config changes follow the SS6 upgrade for the site.
 7. Run the verification SQL again after `dev/build flush=1`.
+8. **Copies of the site extension.** A copy of `DataChangeRecordDataExtension` that walks has_one relations with
+   `foreach` finds no pages on SS6: a Silverstripe 6 model is not iterable, so a has_one relation yields nothing.
+   Delete the copy (step 3 above). The module's `AffectedPagesService` reads has_one relations as one-page lists.
+   Check the Page URL column of a record changed through a has_one relation after the build.
+9. **History cleanup.** The task is a Silverstripe 6 build task. Run it from the command line:
+   `vendor/bin/sake tasks:Dynamic-ChangeTracker-Job-CleanupDataChangeHistoryTask --older="-6 months"`, and add
+   `--run` to delete. Its `run` and `force` options are booleans on line `2`: `run=false` and `run=no` leave it as a
+   dry run.
+10. **Queued pruning jobs.** The job's `priorTo` and `pruneBefore` properties stay public, so a pending
+    `PruneChangesBeforeJob` row keeps the property names it was stored with. Check the row after the build.
