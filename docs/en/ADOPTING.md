@@ -42,7 +42,8 @@ package.
 1. Start from a clean working tree. Make a database snapshot and a backup of the assets. Record the baseline with the
    queries in "Verification SQL" below.
 2. Run the read-only checks:
-   - `grep -rn 'Symbiote' app/_config app/src app/tests` lists every reference to be changed.
+   - `grep -rnE 'Symbiote.DataChange' app/_config app/src` lists every reference to be changed. References in the
+     site's tests and its regression suite are not changed (see Step 4).
    - `SELECT COUNT(*) FROM Permission WHERE Code = 'CMS_ACCESS_DataChangeAdmin';` must be `0`. The build migrates the
      old code to this one, so a site that already holds it would not be migrated cleanly.
 3. Have the new package reachable. Until the module is listed on Packagist, add a VCS repository for it:
@@ -301,11 +302,21 @@ same order.
 AE has no last-modified code. AP's `Seo/PageSeoExtension.php` and `Extension/BlogPostDataExtension.php` have
 `MetaComponents(&$tags)`; those stay as they are on SS5. The SS6 rename is covered in the SS6 section.
 
-## Step 4: tests and README
+## Step 4: tests, regression baselines and README
 
-- MWTR: `app/tests/Cms/AdminScreensTest.php` and `app/tests/Tracker/TrackerSchemaTest.php` name the old class and the old
-  permission code (`CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin`). Update them to the new names, and keep the
-  assertion that the old code is migrated.
+- The site's tests and its regression suite record what the site did before the swap. Their assertions, expected
+  outputs and recorded baselines are not edited, also where they name the old class or the old permission code
+  (`CMS_ACCESS_Symbiote\DataChange\Admin\DataChangeAdmin`). The swap is not a reason to record them again.
+- Each intended difference of the swap is registered as a known difference in the site's regression suite, in a
+  reviewed change, with the value before, the value after and the reason. A registered difference must be observed
+  by the run at the stage it applies to, and a difference that is not registered fails the run. The differences the
+  swap causes:
+  - the permission code of the Data Changes admin (`CMS_ACCESS_DataChangeAdmin`);
+  - the class names in the admin's menu item ID and in the links to a single change record
+    (`Dynamic-ChangeTracker-...` instead of `Symbiote-DataChange-...`);
+  - the stored `ClassName` of the change records;
+  - the warnings that the fork raised and the module does not (a tracked write with nobody logged in, a many_many add
+    by string ID), where the suite records warnings.
 - Every site: the README names the fork. Replace it with the module and this guide.
 
 ## Step 5: build and verify
@@ -350,8 +361,8 @@ orphan queries return 0; the permission queries return only `CMS_ACCESS_DataChan
 `Dynamic\ChangeTracker\Job\PruneChangesBeforeJob`. The live checksum must equal the baseline (the build does not change
 `SiteTree_Live`). The change-record counts must equal the baseline plus the rows written by the site in between.
 
-Also confirm that `grep -rn 'Symbiote' app/_config app/src app/tests` lists only the references this guide keeps (none
-for the module), and that `SELECT ... WHERE Code = 'CMS_ACCESS_Symbiote%'` returns 0 rows.
+Also confirm that `grep -rnE 'Symbiote.DataChange' app/_config app/src` lists nothing (the site's tests keep the old
+names, see Step 4), and that `SELECT ... WHERE Code LIKE 'CMS_ACCESS_Symbiote%'` returns 0 rows.
 
 ## Rollback
 
@@ -395,8 +406,9 @@ in the Injector block as shown.
 
 - Relations: none tracked. `SiteTreeChangeRecordable` on SiteTree only. The six model files of Step 3.
 - HomePage: the duplicate-field audit (below) applies. The Card fields are removed before the FieldGroups on SS6.
-- Regression suite: its `expected` and `known-diffs` files name the old permission code and class. Update them with the
-  suite's own runner, as part of the same change.
+- Tests and regression suite: `app/tests` and the suite's baselines keep the fork's permission code and class names,
+  unedited. The swap's differences (Step 4) are registered as known differences of the module stage, and the run at
+  that stage observes each of them.
 
 ### AE
 
