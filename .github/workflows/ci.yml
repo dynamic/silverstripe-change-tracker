@@ -1,7 +1,7 @@
 name: CI
 
 # silverstripe/gha-ci builds the job matrix (PHP versions, databases, the --prefer-lowest job) from composer.json
-# and the branch name.
+# and the branch name. It runs on every push and pull request, and can be started by hand.
 on:
   push:
   pull_request:
