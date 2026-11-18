@@ -1,107 +1,90 @@
-## Usage
+# Quick start
 
-Add the ChangeRecordable extension to the dataobjects you wish to track
+## Install
+
+Until the module is on Packagist, add its repository to `composer.json`:
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/dynamic/silverstripe-change-tracker.git"
+    }
+]
+```
+
+Require the line that matches the site's Silverstripe CMS version:
 
 ```
+composer require dynamic/silverstripe-change-tracker:^1.0
+```
+
+Line `1` (`^1.0`) is for Silverstripe CMS 5, line `2` (`^2.0`) for Silverstripe CMS 6. The module is applied by its own configuration, so no file in the project needs to change for
+it to run.
+
+## Track a data object
+
+Add the ChangeRecordable extension to any data object you want recorded:
+
+```yaml
 MyDataObject:
   extensions:
-    - Symbiote\DataChange\Extension\ChangeRecordable
+    - Dynamic\ChangeTracker\Extension\ChangeRecordable
 ```
 
-If you are applying the extension to the SiteTree, use the SiteTreeChangeRecordable
-extension to record publish/unpublish actions.
+For a page, use the SiteTreeChangeRecordable extension instead. It also records publish and unpublish:
 
-To track changes to many\_many relationships, you must use a custom
-ManyManyRelationship class, as well as indicate which relationships need
-tracking. This can be directly configured via the Injector
-
-For example
-
+```yaml
+SilverStripe\CMS\Model\SiteTree:
+  extensions:
+    - Dynamic\ChangeTracker\Extension\SiteTreeChangeRecordable
 ```
+
+Published States is a tab on the page's edit form. Its visibility is set by `published_state_permission`, which
+defaults to `CMS_ACCESS_LeftAndMain`.
+
+## Track a many_many relation
+
+The module already installs `TrackedManyManyList` for every many_many relation. Nothing is recorded until a join
+table is listed in `trackedRelationships`:
+
+```yaml
 SilverStripe\Core\Injector\Injector:
   SilverStripe\ORM\ManyManyList:
-    class: Symbiote\DataChange\Model\TrackedManyManyList
     properties:
       trackedRelationships:
         - Page_Regions
-
 ```
 
-will track the "Regions" relationship defined on the Page class;
+This records adds and removes of the "Regions" relation of the Page class.
 
-```
-private static $many_many = array(
-	'Regions'	=> 'SomeObject',
-);
+## Ignore fields
 
-```
-
-## Capturing URL parameters
-
-Set the `save_request_vars` option to 1, and GET and POST vars will be recorded too.
-
-```
-Symbiote\DataChange\Model\DataChangeRecord:
-  save_request_vars: 1
-
-```
-
-
-## Ignoring fields
-
-In some cases it may not be desirable to track changes to all fields of an object. You can define ignored fields in your yml config like so:
-
-```
-Symbiote\DataChange\Extension\ChangeRecordable:
+```yaml
+Dynamic\ChangeTracker\Extension\ChangeRecordable:
   ignored_fields:
     NameOfObjectClass:
       - NameOfField
 ```
 
-Or, for the same field name across all objects
+Fields named in `Dynamic\ChangeTracker\Model\DataChangeRecord.field_blacklist` are never stored, for any class.
+The default blacklist is `Password` and `SearchContent`.
 
-```
-Symbiote\DataChange\Model\DataChangeRecord:
-  field_blacklist:
-    - Password
-    - Email
+## View the changes
 
-```
+Log in as an administrator (or as a member of a group with `CMS_ACCESS_DataChangeAdmin`) and open **Data Changes**.
 
-Also, you may wish to blacklist some request variables from being stored
+## Review pages and documents
 
-```
-Symbiote\DataChange\Model\DataChangeRecord:
-  request_vars_blacklist:
-    - url
-    - SecurityID
+Add `Dynamic\ChangeTracker\Control\AuditListingExtension` to the page controller to get `listpages` and `listdocs`
+for administrators. See the README for the configuration.
 
-```
+## Prune old records
 
-## Significant Change tracking
+Queue `PruneChangesBeforeJob` from the QueuedJobs admin with a constructor argument such as `-6 months`. It keeps the
+newest record older than that date and requeues itself each night. The README has the one-off build task.
 
-Sometimes reporting changes to certain fields to CMS users is desirable (e.g seeing the last time a field was updated).
-This is handled by `SignificantChangeRecordable`, which looks for a list of `significant_fields`.
+## Next steps
 
-Example:
-
-```
-TeamMember:
-  significant_fields:
-    - 'Name'
-    - 'Address'
-    - 'OfficeNumber'
-    - 'Position'
-    - 'Mobile'
-  extensions:
-    - 'Symbiote\DataChange\Extension\ChangeRecordable'
-    - 'Symbiote\DataChange\Extension\SignificantChangeRecordable'
-```
-
-## Pruning old data
-
-Over time, the data recorded will become overwhelming in size. May not be a problem for you, but if it is
-you can regularly prune it to retain just (N) months of data at a time. Simply create the `PruneChangesBeforeJob`
-from the QueuedJob admin section of the CMS, using a constructor param of something like "-6 months".
-
-The job will restart itself to run each night, to consistently remove anything older than six months.
+- [README](../../README.md) for the configuration reference, the affected pages lookup and the upgrade steps.
+- [Deferred defects](DEFERRED.md) for behaviour that is kept on purpose.

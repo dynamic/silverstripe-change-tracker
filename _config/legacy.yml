@@ -1,0 +1,11 @@
+---
+Name: changetracker_legacy
+---
+# Change records written by symbiote/silverstripe-datachange-tracker or the Dynamic fork keep their rows; the build
+# rewrites their ClassName. Silverstripe 5 reads the DatabaseAdmin key, Silverstripe 6 the DbBuild key.
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    Symbiote\DataChange\Model\DataChangeRecord: Dynamic\ChangeTracker\Model\DataChangeRecord
+SilverStripe\Dev\Command\DbBuild:
+  classname_value_remapping:
+    Symbiote\DataChange\Model\DataChangeRecord: Dynamic\ChangeTracker\Model\DataChangeRecord

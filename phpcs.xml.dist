@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="ChangeTracker">
+    <description>PSR-12 without the line length rule</description>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- copies of the sites' code, kept as they were as the reference for the parity tests -->
+    <exclude-pattern>tests/Fixtures/Legacy*</exclude-pattern>
+
+    <rule ref="PSR12">
+        <exclude name="Generic.Files.LineLength"/>
+    </rule>
+
+    <!-- template and framework method names such as MetaComponents() and Value() are not camel case -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <severity>0</severity>
+    </rule>
+
+    <!-- the job file stops loading when the queued jobs module is missing -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>src/Job/PruneChangesBeforeJob.php</exclude-pattern>
+    </rule>
+</ruleset>

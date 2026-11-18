@@ -1,6 +1,6 @@
 <?php
 
-namespace Symbiote\DataChange\Tests;
+namespace Dynamic\ChangeTracker\Tests;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\TestOnly;
@@ -12,7 +12,7 @@ use SilverStripe\Dev\TestOnly;
  */
 class TestTrackedUnderscoreChild extends DataObject implements TestOnly
 {
-    private static $table_name = 'Symbiote_DataChange_Tests_TestTrackedUnderscoreChild';
+    private static $table_name = 'Dynamic_ChangeTracker_Tests_TestTrackedUnderscoreChild';
 
     private static $db = [
         'Title'     => 'Varchar',

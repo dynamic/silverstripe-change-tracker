@@ -1,9 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Model;
+namespace Dynamic\ChangeTracker\ORM;
 
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\DataObject;
+use Dynamic\ChangeTracker\Service\LiveLastEditedPropagator;
 
 /**
  * A replacement manymany list that tracks add and remove calls
@@ -16,7 +17,36 @@ class TrackedManyManyList extends ManyManyList
 
     public function add($item, $extraFields = [])
     {
-        $this->recordManyManyChange(__FUNCTION__, $item);
+        if (!$this->isTrackedJoin()) {
+            return parent::add($item, $extraFields);
+        }
+
+        // an id may come as an int or, from a form, as a numeric string
+        if (is_numeric($item)) {
+            $id = (int)$item;
+        } else {
+            $id = is_object($item) ? $item->ID : null;
+        }
+
+        $existingItem = $this->byID($id);
+        $shouldRecordChange = false;
+
+        if (!$existingItem) {
+            $shouldRecordChange = true;
+        } elseif (!empty($extraFields)) {
+            $currentExtraData = $this->getExtraData($this->getJoinTable(), $id);
+            foreach ($extraFields as $field => $value) {
+                if (!array_key_exists($field, $currentExtraData) || $currentExtraData[$field] !== $value) {
+                    $shouldRecordChange = true;
+                    break;
+                }
+            }
+        }
+
+        if ($shouldRecordChange) {
+            $this->recordManyManyChange(__FUNCTION__, $item);
+        }
+
         $result = parent::add($item, $extraFields);
         return $result;
     }
@@ -28,15 +58,23 @@ class TrackedManyManyList extends ManyManyList
         return $result;
     }
 
+    /**
+     * Whether changes to this list's join table are recorded
+     */
+    protected function isTrackedJoin(): bool
+    {
+        return in_array($this->getJoinTable(), $this->trackedRelationships);
+    }
+
     protected function recordManyManyChange($type, $item)
     {
         $joinName = $this->getJoinTable();
-        if (!in_array($joinName, $this->trackedRelationships)) {
+        if (!$this->isTrackedJoin()) {
             return;
         }
         $parts = explode('_', $joinName);
         if (isset($parts[0]) && count($parts) > 1) {
-            // table name could be sometihng like Symbiote_DataChange_Tests_TestObject_Kids
+            // table name could be sometihng like Dynamic_ChangeTracker_Tests_TestObject_Kids
             // which is ClassName_RelName, with
             $tableName = $parts;
             $relationName = array_pop($tableName);
@@ -60,7 +98,11 @@ class TrackedManyManyList extends ManyManyList
             $join = $type === 'add' ? ' to ' : ' from ';
             $type = ucfirst((string) $type) . ' "' . $item->Title . '"' . $join . $relationName;
             $onItem->RelatedItem = $item->ClassName . ' #' . $item->ID;
-            singleton('DataChangeTrackService')->track($onItem, $type);
+            $changeRecord = singleton('DataChangeTrackService')->track($onItem, $type);
+
+            if ($changeRecord && $changeRecord->hasMethod('AffectedPages')) {
+                LiveLastEditedPropagator::singleton()->onManyManyChange($changeRecord, $item);
+            }
         }
     }
 

@@ -1,9 +1,8 @@
 <?php
 
-namespace Symbiote\DataChange\Service;
+namespace Dynamic\ChangeTracker\Service;
 
-use Symbiote\DataChange\Model\DataChangeRecord;
-
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -11,7 +10,6 @@ use SilverStripe\ORM\DataObject;
  */
 class DataChangeTrackService implements \Stringable
 {
-
     protected $dcr_cache = [];
 
     public $disabled = false;
@@ -27,7 +25,9 @@ class DataChangeTrackService implements \Stringable
             $this->dcr_cache["{$object->ID}-{$object->Classname}"] = DataChangeRecord::create();
         }
 
-        $this->dcr_cache["{$object->ID}-{$object->Classname}"]->track($object, $type);
+        $changeRecord = $this->dcr_cache["{$object->ID}-{$object->Classname}"]->track($object, $type);
+
+        return $changeRecord;
     }
 
     public function resetChangeCache()

@@ -1,13 +1,13 @@
 <?php
 
-namespace Symbiote\DataChange\Tests;
+namespace Dynamic\ChangeTracker\Tests;
 
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\ManyManyList;
-use Symbiote\DataChange\Service\DataChangeTrackService;
-use Symbiote\DataChange\Model\TrackedManyManyList;
+use Dynamic\ChangeTracker\Service\DataChangeTrackService;
+use Dynamic\ChangeTracker\ORM\TrackedManyManyList;
 
 /**
  *
@@ -129,7 +129,7 @@ class DataChangeTest extends SapphireTest
                 'class' => TrackedManyManyList::class,
                 'properties' => [
                     'trackedRelationships' => [
-                        'Symbiote_DataChange_Tests_TestTrackedUnderscoreObject_Kids',
+                        'Dynamic_ChangeTracker_Tests_TestTrackedUnderscoreObject_Kids',
                     ]
                 ]
             ]
@@ -140,7 +140,7 @@ class DataChangeTest extends SapphireTest
         $this->assertEquals(TrackedManyManyList::class, $obj->Kids()::class);
 
         // We want to make sure the join table looks like how we expect.
-        $this->assertEquals('Symbiote_DataChange_Tests_TestTrackedUnderscoreObject_Kids', $obj->Kids()->getJoinTable());
+        $this->assertEquals('Dynamic_ChangeTracker_Tests_TestTrackedUnderscoreObject_Kids', $obj->Kids()->getJoinTable());
 
         //
         // Test Many many changes

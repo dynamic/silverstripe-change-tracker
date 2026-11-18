@@ -1,9 +1,9 @@
 <?php
 
-namespace Symbiote\DataChange\Extension;
+namespace Dynamic\ChangeTracker\Extension;
 
-use Symbiote\DataChange\Service\DataChangeTrackService;
-use Symbiote\DataChange\Model\DataChangeRecord;
+use Dynamic\ChangeTracker\Service\DataChangeTrackService;
+use Dynamic\ChangeTracker\Model\DataChangeRecord;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Core\Config\Config;
 
@@ -15,7 +15,6 @@ use SilverStripe\Core\Config\Config;
  */
 class ChangeRecordable extends DataExtension
 {
-
     /**
      *
      * @var DataChangeTrackService
@@ -35,9 +34,35 @@ class ChangeRecordable extends DataExtension
 
     public function onBeforeWrite()
     {
+        $confirmSkipTracking = function ($record) {
+            $changedFields = $record->getChangedFields(true, 2);
+
+            foreach ($changedFields as $field => $change) {
+                if ($field == 'SecurityID') {
+                    continue;
+                }
+                $before[$field] = $change['before'];
+                $after[$field] = $change['after'];
+            }
+
+            if (
+                isset($before)
+                && count($before) == 1
+                && count($after) == 1
+                && array_key_exists('Version', $before)
+                && array_key_exists('Version', $after)
+            ) {
+                return true;
+            }
+
+            return false;
+        };
+
         parent::onBeforeWrite();
         if ($this->owner->isInDB()) {
-            $this->dataChangeTrackService->track($this->owner, $this->changeType);
+            if (!$confirmSkipTracking($this->owner)) {
+                $this->dataChangeTrackService->track($this->owner, $this->changeType);
+            }
         } else {
             $this->isNewObject = true;
             $this->changeType = 'New';
@@ -84,7 +109,7 @@ class ChangeRecordable extends DataExtension
     {
         return DataChangeRecord::get()->filter([
             'ChangeRecordID' => $this->owner->ID,
-            'ChangeRecordClass' => $this->owner->ClassName
+            'ChangeRecordClass' => $this->owner->ClassName,
         ]);
     }
 }

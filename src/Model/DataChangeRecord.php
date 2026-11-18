@@ -1,8 +1,10 @@
 <?php
 
-namespace Symbiote\DataChange\Model;
+namespace Dynamic\ChangeTracker\Model;
 
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Security;
 use SilverStripe\View\Requirements;
 use SilverStripe\Forms\FieldList;
@@ -13,6 +15,14 @@ use SilverStripe\Versioned\DataDifferencer;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Member;
 use SilverStripe\Control\Director;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Queries\SQLDelete;
+use SilverStripe\ORM\Queries\SQLUpdate;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionRoleCode;
+use Dynamic\ChangeTracker\Admin\DataChangeAdmin;
+use Dynamic\ChangeTracker\Job\PruneChangesBeforeJob;
+use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 
 /**
  * Record a change to a dataobject; use this to track data changes of objects
@@ -22,6 +32,21 @@ use SilverStripe\Control\Director;
  */
 class DataChangeRecord extends DataObject
 {
+    /**
+     * Class name of this model in symbiote/silverstripe-datachange-tracker and the Dynamic fork of it
+     */
+    public const LEGACY_CLASS = 'Symbiote\\DataChange\\Model\\DataChangeRecord';
+
+    /**
+     * Permission code the Data Changes admin required in those packages, derived from its class name
+     */
+    public const LEGACY_PERMISSION_CODE = 'CMS_ACCESS_Symbiote\\DataChange\\Admin\\DataChangeAdmin';
+
+    /**
+     * Class name of the pruning job in those packages, as stored in queued job descriptors
+     */
+    public const LEGACY_PRUNE_JOB_CLASS = 'Symbiote\\DataChange\\Job\\PruneChangesBeforeJob';
+
     private static $table_name = 'DataChangeRecord';
     private static $db = [
         'ChangeType' => 'Varchar',
@@ -41,6 +66,11 @@ class DataChangeRecord extends DataObject
         'ChangedBy' => Member::class,
         'ChangeRecord' => DataObject::class
     ];
+
+    private static $many_many = [
+        'AffectedPages' => SiteTree::class,
+    ];
+
     private static $summary_fields    = [
         'ChangeType' => 'Change Type',
         'ChangeRecordClass' => 'Record Class',
@@ -63,12 +93,18 @@ class DataChangeRecord extends DataObject
      * @var boolean
      */
     private static $save_request_vars      = false;
-    private static $field_blacklist        = ['Password'];
+    /**
+     * Fields never stored in the before and after values of a change. SearchContent is the full text search index
+     * that every site using this module excluded in its own configuration.
+     *
+     * @var string[]
+     */
+    private static $field_blacklist        = ['Password', 'SearchContent'];
     private static $request_vars_blacklist = ['url', 'SecurityID'];
 
     public function getCMSFields($params = null)
     {
-        Requirements::css('symbiote/silverstripe-datachange-tracker: client/css/datachange-tracker.css');
+        Requirements::css('dynamic/silverstripe-change-tracker: client/css/datachange-tracker.css');
 
         $fields = FieldList::create(
             ToggleCompositeField::create(
@@ -101,8 +137,11 @@ class DataChangeRecord extends DataObject
         );
 
         if (strlen($this->Before) && strlen($this->ChangeRecordClass) && class_exists($this->ChangeRecordClass)) {
-            $before = Injector::inst()->create($this->ChangeRecordClass, $this->prepareForDataDifferencer($this->Before), true);
-            $after  = Injector::inst()->create($this->ChangeRecordClass, $this->prepareForDataDifferencer($this->After), true);
+            $decodedBefore = json_decode($this->Before);
+            $decodedAfter  = json_decode((string) $this->After);
+
+            $before = Injector::inst()->create($this->ChangeRecordClass, $decodedBefore);
+            $after  = Injector::inst()->create($this->ChangeRecordClass, $decodedAfter);
             $diff   = DataDifferencer::create($before, $after);
 
             // The solr search service injector dependency causes issues with comparison, since it has public variables that are stored in an array.
@@ -119,10 +158,15 @@ class DataChangeRecord extends DataObject
                 if (is_array($prop)) {
                     $prop = json_encode($prop);
                 }
+
+                if ((is_object($decodedBefore) && !array_key_exists($field, get_object_vars($decodedBefore))) || (is_object($decodedAfter) && !array_key_exists($field, get_object_vars($decodedAfter)))) {
+                    continue;
+                }
+
                 $changedFields[] = $readOnly        = \SilverStripe\Forms\ReadonlyField::create(
                     'ChangedField' . $field,
                     $field,
-                    $prop
+                    DBField::create_field('HTMLText', $prop)
                 );
                 $readOnly->addExtraClass('datachange-field');
             }
@@ -142,14 +186,18 @@ class DataChangeRecord extends DataObject
         foreach ($fields->dataFields() as $field) {
             $value = $field->Value();
             if ($value && is_object($value)) {
-                if ((method_exists($value, 'hasMethod') && !$value->hasMethod('forTemplate')) || !method_exists(
-                    $value,
-                    'forTemplate'
-                )) {
+                if (
+                    (method_exists($value, 'hasMethod') && !$value->hasMethod('forTemplate')) || !method_exists(
+                        $value,
+                        'forTemplate'
+                    )
+                ) {
                     $field->setValue('[Missing ' . $value::class . '::forTemplate]');
                 }
             }
         }
+
+        $this->extend('updateCMSFields', $fields);
 
         $fields = $fields->makeReadonly();
 
@@ -259,8 +307,132 @@ class DataChangeRecord extends DataObject
         $this->Referer  = $_SERVER['HTTP_REFERER'] ?? '';
         $this->Agent    = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
+        foreach (['ChangeType', 'ObjectTitle', 'CurrentURL', 'Referer', 'RemoteIP', 'Agent'] as $field) {
+            $this->$field = $this->truncateToFieldSize($field, $this->$field);
+        }
+
         $this->write();
+
+        if ($this->hasMethod('getAffectedPageRecords')) {
+            $this->AffectedPages()->addMany($this->getAffectedPageRecords() ?? []);
+        }
+
         return $this;
+    }
+
+    /**
+     * Bring data written by symbiote/silverstripe-datachange-tracker, or the Dynamic fork of it, in line with this
+     * module. Each statement is limited to one table and only touches rows that still hold a legacy value, so running
+     * the build again changes nothing.
+     *
+     * - ClassName of change records: rows that still name the legacy class, or that were written with an empty value
+     *   while the old and new code were swapped, get the class of this model. The ClassName remapping in
+     *   _config/legacy.yml covers the first case during the build; this repeats it for rows written afterwards.
+     * - Permission and PermissionRoleCode: the legacy admin access code becomes the code DataChangeAdmin requires.
+     * - QueuedJobDescriptor, when the queued jobs module is installed: pending pruning jobs get the new class name.
+     */
+    public function requireDefaultRecords()
+    {
+        parent::requireDefaultRecords();
+
+        $schema = DataObject::getSchema();
+
+        $this->migrateLegacyValue(
+            $schema->tableName(DataChangeRecord::class),
+            'ClassName',
+            ['', self::LEGACY_CLASS],
+            DataChangeRecord::class,
+            'change records'
+        );
+
+        $code = DataChangeAdmin::config()->get('required_permission_codes');
+        if (is_string($code) && $code !== self::LEGACY_PERMISSION_CODE) {
+            foreach ([Permission::class, PermissionRoleCode::class] as $class) {
+                $this->migrateLegacyValue(
+                    $schema->tableName($class),
+                    'Code',
+                    [self::LEGACY_PERMISSION_CODE],
+                    $code,
+                    'permission codes'
+                );
+            }
+            // drop permissions cached in this process before the codes changed
+            Permission::reset();
+        }
+
+        if (class_exists(QueuedJobDescriptor::class)) {
+            $table = $schema->tableName(QueuedJobDescriptor::class);
+            if (DB::get_schema()->hasTable($table)) {
+                $this->migrateLegacyValue(
+                    $table,
+                    'Implementation',
+                    [self::LEGACY_PRUNE_JOB_CLASS],
+                    PruneChangesBeforeJob::class,
+                    'queued pruning jobs'
+                );
+            }
+        }
+    }
+
+    /**
+     * @param string $table
+     * @param string $column
+     * @param string[] $legacyValues
+     * @param string $value
+     * @param string $description for the build output
+     */
+    private function migrateLegacyValue(
+        string $table,
+        string $column,
+        array $legacyValues,
+        string $value,
+        string $description
+    ): void {
+        $placeholders = implode(', ', array_fill(0, count($legacyValues), '?'));
+        SQLUpdate::create('"' . $table . '"', ['"' . $column . '"' => $value])
+            ->addWhere(['"' . $column . '" IN (' . $placeholders . ')' => $legacyValues])
+            ->execute();
+
+        $count = DB::affected_rows();
+        if ($count > 0) {
+            DB::alteration_message("Updated $count legacy $description in $table.$column", 'changed');
+        }
+    }
+
+    /**
+     * Delete AffectedPages join rows whose change record no longer exists, as left behind by pruning
+     *
+     * @return int number of rows deleted
+     */
+    public static function deleteOrphanAffectedPageRows(): int
+    {
+        $schema = DataObject::getSchema();
+        $component = $schema->manyManyComponent(DataChangeRecord::class, 'AffectedPages');
+        $table = $schema->tableName(DataChangeRecord::class);
+
+        SQLDelete::create('"' . $component['join'] . '"')
+            ->addWhere('"' . $component['parentField'] . '" NOT IN (SELECT "ID" FROM "' . $table . '")')
+            ->execute();
+
+        return DB::affected_rows();
+    }
+
+    /**
+     * Cut a value to the size of its column, counting characters, which is what the database did with longer values
+     * so far. Scalar values are stored as strings; null and other values are left alone.
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return mixed
+     */
+    private function truncateToFieldSize(string $field, $value)
+    {
+        if (!is_scalar($value) && !$value instanceof \Stringable) {
+            return $value;
+        }
+        $value = (string)$value;
+        $size = (int)$this->dbObject($field)->getSize();
+        return $size > 0 ? mb_substr($value, 0, $size, 'UTF-8') : $value;
     }
 
     /**

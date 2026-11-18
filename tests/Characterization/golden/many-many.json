@@ -1,0 +1,131 @@
+[
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": {
+            "ClassName": "TrackedPage",
+            "ID": "#id",
+            "Title": "Owner page",
+            "URLSegment": "owner-page"
+        },
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": {
+            "ClassName": "TrackedPage",
+            "ID": 0,
+            "Title": null,
+            "URLSegment": null
+        },
+        "ChangeType": "New",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Add \"one\" to Kids",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Add \"two\" to Kids",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Add \"three\" to SortedKids",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Add \"three\" to SortedKids",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Remove \"one\" from Kids",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    },
+    {
+        "AffectedPages": [
+            "TrackedPage:page"
+        ],
+        "After": null,
+        "Agent": "CharacterizationAgent/1.0",
+        "Before": null,
+        "ChangeType": "Add \"three\" to Kids",
+        "CurrentEmail": "ADMIN@example.org",
+        "CurrentURL": "http://tracker.test:8080/admin/pages/edit/EditForm/7/field/Pages?q=1",
+        "ObjectTitle": "Owner page",
+        "Record": "TrackedPage:page",
+        "Referer": "http://referrer.test/previous",
+        "RemoteIP": "203.0.113.7",
+        "Stage": "Stage.Stage",
+        "User": "member"
+    }
+]
