@@ -5,7 +5,7 @@ namespace Dynamic\ChangeTracker\Service;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Core\Injector\Injectable;
 use Dynamic\ChangeTracker\Model\DataChangeRecord;
 

@@ -90,8 +90,8 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
         $record = $this->changeRecord();
 
         $field = $record->getCMSFields()->dataFieldByName('User');
-        $this->assertSame($record->getMemberDetails(), $field->Value());
-        $this->assertStringContainsString('<' . $record->CurrentEmail . '>', $field->Value());
+        $this->assertSame($record->getMemberDetails(), $field->getValue());
+        $this->assertStringContainsString('<' . $record->CurrentEmail . '>', $field->getValue());
     }
 
     public function testChangedFieldsOnlyForKeysInJson()
@@ -106,8 +106,8 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
     {
         $field = $this->changeRecord()->getCMSFields()->dataFieldByName('ChangedFieldBody');
 
-        $this->assertInstanceOf(DBHTMLText::class, $field->Value());
-        $html = preg_replace('/\s+/', ' ', $field->Value()->getValue());
+        $this->assertInstanceOf(DBHTMLText::class, $field->getValue());
+        $html = preg_replace('/\s+/', ' ', $field->getValue()->getValue());
         $this->assertStringContainsString('<del>old</del>', $html);
         $this->assertStringContainsString('<ins>new</ins>', $html);
         $this->assertSame('Body', $field->Title());
@@ -145,7 +145,7 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
         // array cannot be diffed and the whole screen fails
         $record = $this->lastRecord();
         $this->expectException(TypeError::class);
-        $this->expectExceptionMessage('nl2br()');
+        $this->expectExceptionMessage('DBField::XML(): Return value must be of type string, array returned');
         $record->getCMSFields();
     }
 
@@ -157,7 +157,7 @@ class DataChangeRecordCMSFieldsTest extends CharacterizationTestCase
 
         $fields = $this->changeRecord()->getCMSFields();
 
-        $this->assertSame('[Missing stdClass::forTemplate]', $fields->dataFieldByName('Referer')->Value());
+        $this->assertSame('[Missing stdClass::forTemplate]', $fields->dataFieldByName('Referer')->getValue());
     }
 
     public function testExtensionRemovesNoiseRows()

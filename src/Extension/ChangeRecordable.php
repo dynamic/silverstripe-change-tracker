@@ -4,16 +4,19 @@ namespace Dynamic\ChangeTracker\Extension;
 
 use Dynamic\ChangeTracker\Service\DataChangeTrackService;
 use Dynamic\ChangeTracker\Model\DataChangeRecord;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Extension;
 
 /**
  * Add to classes you want changes recorded for
  *
+ * Silverstripe 6 extensions do not extend DataExtension and have no parent hooks to call, so the hooks below do
+ * not call parent:: and read the object through getOwner().
+ *
  * @author  marcus@symbiote.com.au
  * @license BSD License http://silverstripe.org/bsd-license/
  */
-class ChangeRecordable extends DataExtension
+class ChangeRecordable extends Extension
 {
     /**
      *
@@ -26,11 +29,6 @@ class ChangeRecordable extends DataExtension
     protected $isNewObject = false;
 
     protected $changeType = 'Change';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public function onBeforeWrite()
     {
@@ -58,10 +56,9 @@ class ChangeRecordable extends DataExtension
             return false;
         };
 
-        parent::onBeforeWrite();
-        if ($this->owner->isInDB()) {
-            if (!$confirmSkipTracking($this->owner)) {
-                $this->dataChangeTrackService->track($this->owner, $this->changeType);
+        if ($this->getOwner()->isInDB()) {
+            if (!$confirmSkipTracking($this->getOwner())) {
+                $this->dataChangeTrackService->track($this->getOwner(), $this->changeType);
             }
         } else {
             $this->isNewObject = true;
@@ -71,23 +68,21 @@ class ChangeRecordable extends DataExtension
 
     public function onAfterWrite()
     {
-        parent::onAfterWrite();
         if ($this->isNewObject) {
-            $this->dataChangeTrackService->track($this->owner, $this->changeType);
+            $this->dataChangeTrackService->track($this->getOwner(), $this->changeType);
             $this->isNewObject = false;
         }
     }
 
     public function onBeforeDelete()
     {
-        parent::onBeforeDelete();
-        $this->dataChangeTrackService->track($this->owner, 'Delete');
+        $this->dataChangeTrackService->track($this->getOwner(), 'Delete');
     }
 
     public function getIgnoredFields()
     {
         $ignored = Config::inst()->get(ChangeRecordable::class, 'ignored_fields');
-        $class = $this->owner->ClassName;
+        $class = $this->getOwner()->ClassName;
         if (isset($ignored[$class])) {
             return array_combine($ignored[$class], $ignored[$class]);
         }
@@ -95,8 +90,8 @@ class ChangeRecordable extends DataExtension
 
     public function onBeforeVersionedPublish($from, $to)
     {
-        if ($this->owner->isInDB()) {
-            $this->dataChangeTrackService->track($this->owner, 'Publish ' . $from . ' to ' . $to);
+        if ($this->getOwner()->isInDB()) {
+            $this->dataChangeTrackService->track($this->getOwner(), 'Publish ' . $from . ' to ' . $to);
         }
     }
 
@@ -108,8 +103,8 @@ class ChangeRecordable extends DataExtension
     public function getDataChangesList()
     {
         return DataChangeRecord::get()->filter([
-            'ChangeRecordID' => $this->owner->ID,
-            'ChangeRecordClass' => $this->owner->ClassName,
+            'ChangeRecordID' => $this->getOwner()->ID,
+            'ChangeRecordClass' => $this->getOwner()->ClassName,
         ]);
     }
 }
